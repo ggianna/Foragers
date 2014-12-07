@@ -23,7 +23,7 @@ class TowerClass(object):
             return " t ";
         if (self.currentHp < 0.5 * self.hp):
             return "_T_";
-        return "/T\\";
+        return "|T|";
 
 class Fort(TowerClass):
     def __init__(self):
@@ -42,7 +42,7 @@ class Fort(TowerClass):
             return " f ";
         if (self.currentHp < 0.5 * self.hp):
             return "_F_";
-        return "/F\\";
+        return "|F|";
         
 class IllusionistTower(TowerClass):
     def __init__(self):
@@ -61,7 +61,7 @@ class IllusionistTower(TowerClass):
             return " i ";
         if (self.currentHp < 0.5 * self.hp):
             return "_I_";
-        return "/I\\";
+        return "|I|";
         
 class FireElementalistTower(TowerClass):
     def __init__(self):
@@ -80,7 +80,7 @@ class FireElementalistTower(TowerClass):
             return " e ";
         if (self.currentHp < 0.5 * self.hp):
             return "_E_";
-        return "/E\\";
+        return "|E|";
         
         
 class WaterElementalistTower(TowerClass):
@@ -100,5 +100,5 @@ class WaterElementalistTower(TowerClass):
             return " w ";
         if (self.currentHp < 0.5 * self.hp):
             return "_W_";
-        return "/W\\";
+        return "|W|";
         

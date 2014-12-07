@@ -1,7 +1,8 @@
 from abilities import *;
+from unitStrategy import *;
 
 class SoldierClass(object):
-    def __init__(self):
+    def __init__(self,  economy = None,  gameMap  = None):
         self.x = 0;
         self.y = 0;
         self.z = 0;
@@ -16,12 +17,81 @@ class SoldierClass(object):
         self.resistances = [];
         self.immunities = [];
         self.damageType = "physical";
+        # TODO: Check what to do with gameMap
+        self.strategy = UnitStrategyClass(economy,  self,  gameMap.homePos);
         
         self.currentHp = self.hp;
         self.currentMp = self.mp;
+        
+        self.fullness = 100;
+        self.treasure = 0;
+        
+        self.economy = economy;
+        self.gameMap = gameMap;
 
-    def move(self, xMove, yMove):
-        self.move3D(xMove, yMove, 0);
+    def foesToAttack(self,  friends,  foes):
+        res = [];
+        for curFoe in foes:
+            # TODO: Use "in range" approach
+            if (curFoe.x == self.x and curFoe.y == self.y):
+                res.append(curFoe);
+        
+        return res;
+
+    def friendsNear(self,  friends,  foes):
+        res = [];
+        for curFriend in friends:
+            # TODO: Use "in range" approach
+            if (curFriend.x == self.x and curFriend.y == self.y):
+                res.append(curFriend);
+        
+        return res;
+
+    def act(self,  friends,  foes,  game):
+        
+        lTraps = self.gameMap.getTraps(self.x,  self.y);
+        lTreasures = self.gameMap.getTreasures(self.x,  self.y);
+        lFoes = self.foesToAttack(friends,  foes);
+        lFriends = self.friendsNear(friends,  foes);
+        
+        # Decide move
+        mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
+        # DEBUG LINES
+        game.output.log("Moving:" + str(mMove));
+        ##########
+        self.move(mMove);
+        
+        if len(lTraps) > 0:
+            for curTrap in lTraps:
+                # DEBUG LINES
+                game.output.log("\n\n!!! Interacted with trap %s."%(str((curTrap.x,  curTrap.y))));
+                ##########
+                
+                if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes):
+                  return;
+                
+        if len(lFoes) > 0:
+            for curTFoe in lFoes:
+                # DEBUG LINES
+                game.output.log("\nBattled foe!");
+                ##########
+                if not game.interactWithFoe(self,  curFoe,  lFriends,  lFoes):
+                  return;
+                
+        if len(lTreasures) > 0:
+            for curTreasure in lTreasures:
+                # DEBUG LINES
+                game.output.log("\nGot treasure %s!!!"%(str((curTreasure.x,  curTreasure.y))));
+                ##########
+                if not game.interactWithTreasure(self,  curTreasure,  lFriends,  lFoes):
+                  return;
+
+        
+    def move(self, moveTuple):
+        self.move3D(moveTuple[0], moveTuple[1], 0);
+        
+#    def move(self, xMove, yMove):
+#        self.move3D(xMove, yMove, 0);
         
     def move3D(self, xMove, yMove, zMove):
         self.x += xMove;
@@ -40,8 +110,8 @@ class SoldierClass(object):
 
         
 class KnightClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.hp *= 1.25; # 10 percent more hitpoints
         self.damageType = "physical";
@@ -61,8 +131,8 @@ class KnightClass(SoldierClass):
         return "/K\\";
 
 class BarbarianClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.hp *= 1.25; # 10 percent more hitpoints
         self.damageType = "physical";
@@ -85,8 +155,8 @@ class BarbarianClass(SoldierClass):
 
         
 class MageClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.50;
         self.hp *= 0.90;
@@ -106,8 +176,8 @@ class MageClass(SoldierClass):
         return "/M\\";
 
 class DruidClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.50;
         self.hp *= 0.90;
@@ -127,8 +197,8 @@ class DruidClass(SoldierClass):
         return "/D\\";
 
 class ArchmageClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.80;
         self.attackSpeed *= 0.6;
@@ -149,8 +219,8 @@ class ArchmageClass(SoldierClass):
         return "/A\\";
 
 class RangerClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.20;
         self.attackSpeed *= 1.20;
@@ -170,8 +240,8 @@ class RangerClass(SoldierClass):
         return "/R\\";
 
 class AssassinClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.90;
         self.attackSpeed *= 1.50;
@@ -191,8 +261,8 @@ class AssassinClass(SoldierClass):
         return "/X\\";
 
 class EnchanterClass(SoldierClass):
-    def __init__(self):
-        SoldierClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.50;
         self.attackSpeed *= 0.70;
@@ -211,3 +281,44 @@ class EnchanterClass(SoldierClass):
             return "_E_";
         return "/E\\";
 
+class TechnicianClass(SoldierClass):
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
+        
+        self.attack *= 0.50;
+        self.attackSpeed *= 0.70;
+        self.hp *= 0.80;
+        self.damageType = "physical";
+        self.defence *= 0.70;
+        self.abilities += [DisarmTrap(self)];
+
+        self.currentHp = self.hp;
+        self.currentMp = self.mp;
+
+    def __str__(self):
+        if (self.currentHp < 0.3 * self.hp):
+            return " t ";
+        if (self.currentHp < 0.5 * self.hp):
+            return "_T_";
+        return "/T\\";
+
+class ChartographerClass(SoldierClass):
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
+        
+        self.attack *= 0.50;
+        self.attackSpeed *= 0.70;
+        self.hp *= 0.80;
+        self.damageType = "physical";
+        self.defence *= 0.70;
+        self.abilities += [MapLabyrinth(self)];
+
+        self.currentHp = self.hp;
+        self.currentMp = self.mp;
+
+    def __str__(self):
+        if (self.currentHp < 0.3 * self.hp):
+            return " t ";
+        if (self.currentHp < 0.5 * self.hp):
+            return "_T_";
+        return "/T\\";

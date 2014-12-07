@@ -7,9 +7,8 @@ import time;
 import math;
 import random;
 import gamemap;
+from pprint import pformat
 
-import sys;
-import select;
 #import pygame;
 #from pygame.locals import *;
 
@@ -23,7 +22,7 @@ output = Output();
 class Game(object):
     
   def getInstanceOf(self,  sClassName):
-      return eval("soldiers." + sClassName +"()");
+      return eval("soldiers." + sClassName +"(self.economy, self.gameMap)");
       
   # Method definitions
   def selectArmy(self,  eEconomy):
@@ -34,15 +33,16 @@ class Game(object):
       output.dump();
       
       aUnitPool = [
-      "ArchmageClass",  
-      "AssassinClass", 
-      "BarbarianClass",
-      "DruidClass",  
-      "EnchanterClass", 
-      "KnightClass",  
-      "MageClass",  
-      "RangerClass", 
-      "SoldierClass"
+#      "ArchmageClass",  
+#      "AssassinClass", 
+#      "BarbarianClass",
+#      "DruidClass",  
+#      "EnchanterClass", 
+#      "KnightClass",  
+#      "MageClass",  
+#      "RangerClass", 
+#      "SoldierClass"
+        "TechnicianClass"
       ];
       while (curMoney > 0):
           curChoice = random.choice(aUnitPool);
@@ -56,13 +56,16 @@ class Game(object):
                 if eEconomy.cost(self.getInstanceOf(cChoice)) <= curMoney:
                     # buy the army
                     curChoice = cChoice;
-                # If we found nothing we can afford
-                if (curChoice == None):
-                  output.log("\nTotal army value: %d$\n"%(iTotalValue));
-                  # quit
-                  return aArmy;
+              # If we found nothing we can afford
+              if (curChoice == None):
+                output.log("\nTotal army value: %d$\n"%(iTotalValue));
+                # quit
+                return aArmy;
           # else buy the army
           armyToAdd = self.getInstanceOf(curChoice);
+          # assign color
+          armyToAdd.color = self.attackerColor;
+          
           aArmy.append(armyToAdd);
           output.log("Selected %s for %d$. " %(str(curChoice),  eEconomy.cost(armyToAdd)));
           # update our running total of money
@@ -93,34 +96,55 @@ class Game(object):
       return oTo;
 
   def printGameState(self):
-#      output.color(self.attackerColor);
-#      output.log("\nAtt:" + " ".join([(str(x)) for x in self.aAttackers])) ;
-#      output.color(self.defenderColor);
-#      output.log("\tDef:" + " ".join([(str(x)) for x in self.aDefenders]));
-#      output.color();
       output.dump();
 
   def repaintTerrain(self):
-    output.drawMap(self.gameMap,  self.aAttackers,  self.aDefenders, 
-      self.attackerColor,  self.defenderColor);
+    output.drawMap(self.gameMap,  self.aAttackers,  [], 
+      self.attackerColor,  "");
 
-    
-  def act(self, actor, friends, foes, friendColor, foeColor):
-      output.color(friendColor);
+  def interactWithTrap(self,  actor,  trap,  friends,  foes):
+      self.act(actor,  trap,  friends,  foes);
+      self.act(trap,  actor,  [],  [actor]);
+      
+      if (trap.hp <= 0):
+        self.gameMap.traps.remove(trap);
+
+      return actor.currentHp > 0;
+
+  def interactWithTreasure(self,  actor,  treasure,  friends,  foes):
+      treasure.applyEffectTo(actor);
+      self.gameMap.treasures.remove(treasure);
+      
+      return True;
+      
+  def interactWithFoe(self,  actor, foe,  friends,  foes):
+      self.act(actor,  foe,  friends,  foes);
+      self.act(foe,  actor,  foes,  friends);
+      
+      return actor.currentHp > 0;
+      
+  def act(self, actor, target,  friends, foes):     
+      if (actor is SoldierClass):
+        output.color(actor.color);
       
       # Use abilities, if they exist
-      if (len(actor.abilities) > 0):
+      if len(actor.abilities) > 0:
         # DEBUG LINES
         #output.log("Using ability!");
-        for aCurAbility in actor.abilities:
-          
+        for aCurAbility in actor.abilities:          
           # DEBUG LINES
           #output.log("Ability group:" + aCurAbility.group);
-          if aCurAbility.group == "foes":
-            if (len(foes) > 0):
-                foe = foes[0];
-            else:
-                continue;
+          
+          if isinstance(target,  TrapClass):
+            print "Found TRAP!";
+            foe = target;
+            raw_input();
+          else:
+            if aCurAbility.group == "foes":
+              if target in foes:
+                  foe = target;
+              else:
+                  continue;
               
             # Check probability for probability-based abilities
             try:
@@ -161,31 +185,28 @@ class Game(object):
             except:
               pass; # Ignore
 
-
-	    
-	    
-
-      # Deal damage, if anyone left
-      if (len(foes) > 0):
-        foes[0].currentHp = self.dealDamage(actor, foes[0]).currentHp;
-      # Reset color
+      # Deal damage, if target is still a foe
+      if target in foes:
+        target.currentHp = self.dealDamage(actor, target).currentHp;
+      # Reset color 
       output.color();
     
   def run(self):
+    # Init output
+    self.output = output;
     output.log("Game begins!");
     
-    # Init map
-    self.gameMap = gamemap.GameMap(10, 10);
-    self.eEconomy = Economy(10000);
+    # Set colors
+    self.attackerColor = "white";
     
-    # Init fighters
-    #aDefenders = [TowerClass(), Fort(), FireElementalistTower(), WaterElementalistTower()];
-    self.aDefenders = self.selectArmy(self.eEconomy);
+    # Init map
+    self.economy = Economy(500);
+    self.gameMap = gamemap.GameMap(self.economy, 20, 20);
+    
+
+    self.aAttackers = self.selectArmy(self.economy);
     output.dump();
-    time.sleep(1);
-    self.aAttackers = self.selectArmy(self.eEconomy);
-    output.dump();
-    time.sleep(1);
+    time.sleep(0.5);
     
     # Position armies
     iX = 0; iY = 2;
@@ -197,18 +218,7 @@ class Game(object):
             iX = 0;
             iY += 1;
 
-    iX = 0; iY = 0;
-    for oItemD in self.aDefenders:
-        oItemD.x = iX;
-        oItemD.y = iY;
-        iX += 1;
-        if (iX == self.gameMap.xSize):
-            iX = 0;
-            iY += 1;
 
-    # Set colors
-    self.attackerColor = "yellow";
-    self.defenderColor = "green";
 
 
     # Main game loop
@@ -216,59 +226,52 @@ class Game(object):
     self.repaintTerrain();
     iRowCnt = 0;
     
-    while (True):
+    while (True):        
         bShouldRepaint = False;
         
         iGameTime += 1; # Next moment
+        self.gameTime = iGameTime;        
         bEndConditions = False;
         
         # Local vars
         aAttackers = self.aAttackers;
-        aDefenders = self.aDefenders;
-        
-        cCurAttacker = aAttackers[0];
-        cCurDefender = aDefenders[0];
         
         bActed = False;
-        if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
-          self.act(cCurAttacker, aAttackers, aDefenders, self.attackerColor, self.defenderColor);
-          bActed = True;
-
-        if (iGameTime % round(1000.0 /cCurDefender.attackSpeed)) == 0:
-          self.act(cCurDefender, aDefenders, aAttackers, self.defenderColor, self.attackerColor);
-          bActed = True;
-
-        if (cCurAttacker.currentHp <= 0):
-            output.log(colored("Attacker", self.attackerColor) + " has died!");
+        
+        for cCurAttacker in aAttackers:
+            if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
+              cCurAttacker.act(aAttackers,  [],  self);
+              # Reduce fullness
+              cCurAttacker.fullness -= 1;
+              # DEBUG LINES
+              output.log("\n" + str(cCurAttacker) + "\n");
+              output.log(pformat(vars(cCurAttacker)) + "\n");
+              bActed = True;
+        
+        if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness == 0):
+            output.log(colored("\nAttacker", self.attackerColor) + " has died!");
             self.aAttackers = aAttackers[1:];
-            bActed = True;
-        if (cCurDefender.currentHp <= 0):
-            output.log(colored("Defender", self.defenderColor) + " has died!");
-            bShouldRepaint = True;
-            self.aDefenders = aDefenders[1:];
             bActed = True;
         
         if (bActed):
             self.repaintTerrain();
             output.log("\n");
             self.printGameState();
-            time.sleep(2);
+            time.sleep(1);
             iRowCnt += 1;
             if (iRowCnt >= 5 or bShouldRepaint):
                 if (bShouldRepaint):
-                    time.sleep(2);
+                    time.sleep(1);
                     iRowCnt = 0;
                 
         # TODO: Remove
-        bEndConditions = (len(self.aAttackers) == 0) or (len(self.aDefenders) == 0);
+        bEndConditions = (len(self.aAttackers) == 0);
         # End of game
         if (bEndConditions):
             break;
 
     if (len(self.aAttackers) == 0):
         output.log("\n\nNo Attackers left! Defenders win!");
-    if (len(self.aDefenders) == 0):
-        output.log("\n\nNo Defenders left! Attackers win!");
 
     # Final output
     output.dump();

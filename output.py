@@ -8,7 +8,6 @@ class Output(object):
   def __init__(self):
     self.msg = "";
     self.nextColor = None;
-    self.utils = Utils();
   
   def log(self, msg):
     if (self.nextColor == None):
@@ -21,10 +20,10 @@ class Output(object):
     self.msg = "";
     
   def write(self):
-    print self.utils.padWithSpaces(self.msg, 79)[0:79],;
+    print Utils.padWithSpaces(self.msg, 79)[0:79],;
     
   def writeln(self):
-    print self.utils.padWithSpaces(self.msg, 79)[0:79];
+    print Utils.padWithSpaces(self.msg, 79)[0:79];
     
   def clear(self):
     self.msg = "";
@@ -33,23 +32,45 @@ class Output(object):
     self.nextColor = sColor;
     
 
-  def drawMap(self,  mapToDraw,  attackers,  defenders,  attackersColor,  defendersColor):
+  def drawMap(self,  mapToDraw,  attackers,  defenders,  attackersColor,  defendersColor, 
+    trapColor = "red", treasureColor = "yellow", terrainColor = "green"):
       # Clear screen
-      self.utils.cls();
+      Utils.cls();
       
       mapInstance = copy.deepcopy(mapToDraw);
+      # Init squares
+      mapInstance.squares = [[ colored('...', terrainColor) for iCnt in range(0, mapInstance.xSize) ] for iCnt in range(0, mapInstance.ySize)];
       
-      # Render
+      # Add traps
+      for iCnt in range(0,  mapInstance.xSize): 
+        for iCnt2 in range(0,  mapInstance.ySize):
+          squareTreasures = mapInstance.getTreasures(iCnt, iCnt2);
+          squareTraps = mapInstance.getTraps(iCnt, iCnt2);
+      
+          # If treasure in square
+          if (len(squareTreasures)) > 0:
+            # Show the first
+            mapInstance.squares[iCnt][iCnt2] = colored(str(squareTreasures[0]), treasureColor);
+          else:
+            # If trap in square
+            if (len(squareTraps)) > 0:
+              # Show the first
+              mapInstance.squares[iCnt][iCnt2] = colored(str(squareTraps[0]), trapColor);
+          
+      # Render soldiers
       for cItem in  attackers:
-          mapInstance.squares[cItem.y][cItem.x] = colored(str(cItem),  attackersColor);
+          mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  attackersColor);
       for cItem in  defenders:
-          mapInstance.squares[cItem.y][cItem.x] = colored(str(cItem),  defendersColor);
-      # Show
+          mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  defendersColor);
+                
+      
+      # Show map
       for curRow in range(mapInstance.ySize):
           for curCol in range(mapInstance.xSize):
-              sys.stdout.write(mapInstance.squares[curRow][curCol]);
+              sys.stdout.write(mapInstance.squares[curCol][curRow]);
           sys.stdout.write("\n");
-      
+
+      # Get rid of deep map copy
       del mapInstance;
 
 if __name__ == "__main__":

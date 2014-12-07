@@ -12,7 +12,7 @@ class Ability(object):
     if (not self.isApplicable(target, friends, foes)):
       # DEBUG LINES
       #print "Not applicable to " + type(target).__name__ + " in " +\
-	#self.group + " group.";
+    #self.group + " group.";
       return None; # Indicate problem
     
     #print "Applying " + type(self).__name__ + " to " +\
@@ -35,7 +35,7 @@ class Heal(Ability):
   
   def __init__(self, owner):
     Ability.__init__(self, owner);
-    self.targetType = type(soldiers.SoldierClass());
+    self.targetType =soldiers.SoldierClass;
     
   def applyTo(self, target, friends, foes):
     target = Ability.applyTo(self, friends, foes);
@@ -49,7 +49,7 @@ class Heal(Ability):
 class Harm(Ability):
   def __init__(self, owner):
     Ability.__init__(self, owner);
-    self.targetType = type(soldiers.SoldierClass());
+    self.targetType = soldiers.SoldierClass;
     
   def applyTo(self, target, friends, foes):
     target = Ability.applyTo(self, target, friends, foes);
@@ -64,7 +64,7 @@ class Harm(Ability):
 class Haste(Ability):
   def __init__(self, owner):
     Ability.__init__(self, owner);
-    self.targetType = type(soldiers.SoldierClass());
+    self.targetType =soldiers.SoldierClass;
     
   def applyTo(self, target, friends, foes):
     target = Ability.applyTo(self, target, friends, foes);
@@ -78,7 +78,7 @@ class Haste(Ability):
 class Slow(Ability):
   def __init__(self, owner):
     Ability.__init__(self, owner);
-    self.targetType = type(soldiers.SoldierClass());
+    self.targetType =soldiers.SoldierClass;
     
   def applyTo(self, target, friends, foes):
     target = Ability.applyTo(self, target, friends, foes);
@@ -93,7 +93,7 @@ class Slow(Ability):
 class DustToDust(Ability):
   def __init__(self, owner):
     Ability.__init__(self, owner);
-    self.targetType = type(towers.TowerClass());
+    self.targetType = towers.TowerClass;
     
   def applyTo(self, target, friends, foes):
     target = Ability.applyTo(self, target, friends, foes);
@@ -185,6 +185,95 @@ class Rage(Ability):
     self.owner.defence /= 1.0 + (self.owner.hp - self.owner.currentHp) / (5 * self.owner.hp);
     self.owner.attack *= 1.0 + (self.owner.hp - self.owner.currentHp ) / (5 * self.owner.hp);
     
-    self.msg = "* %s is enraged! Defense is increased. Now defence is %4.2f and attack is %4.2f"%(str(self.owner), self.owner.defence, self.owner.attack);
+    self.msg = "* %s is enraged! Defense is increased. Now defence is %4.2f and attack is %4.2f."%(str(self.owner), self.owner.defence, self.owner.attack);
     
     return target;
+
+class Exhaust(Ability):
+  def __init__(self, owner):
+    Ability.__init__(self, owner);
+    self.targetType = soldiers.SoldierClass;    
+    self.frequency = "0.10";
+    
+  def applyTo(self, target, friends, foes):
+    target = Ability.applyTo(self, target, friends, foes);
+    if (target == None):
+      return None;
+    
+    target.fullness -= 10;
+    self.msg = "* %s EXHAUSTS %s. Now fullness of the latter is %4.2f."%(str(self.owner), str(target), target.fullness);
+    
+    return target;
+
+class Poison(Ability):
+  def __init__(self, owner):
+    Ability.__init__(self, owner);
+    self.targetType = soldiers.SoldierClass;    
+    self.frequency = "0.20";
+    
+  def applyTo(self, target, friends, foes):
+    target = Ability.applyTo(self, target, friends, foes);
+    if (target == None):
+      return None;
+  
+    target.attack *= 0.9;
+    target.attackSpeed *= 0.9;
+    target.defence *= 0.9;
+    
+    self.msg = "* %s POISONS %s. Now attack, defence and speed of the latter are reduced."%(str(self.owner), str(target));
+    
+    return target;
+
+class Disease(Ability):
+  def __init__(self, owner):
+    Ability.__init__(self, owner);
+    self.targetType = soldiers.SoldierClass;    
+    self.frequency = "0.20";
+    
+  def applyTo(self, target, friends, foes):
+    target = Ability.applyTo(self, target, friends, foes);
+    if (target == None):
+      return None;
+  
+    target.vulnerabilities += ['physical'];
+    
+    self.msg = "* %s causes DISEASE to %s. Now the target is vulnerable to physical attacks."%(str(self.owner), str(target));
+    
+    return target;
+
+from traps import *;
+
+class MapLabyrinth(Ability):
+    def __init__(self, owner):
+      Ability.__init__(self, owner);
+      self.targetType = traps.Labyrinth;
+#      self.frequency = "0.90";
+    
+    def applyTo(self, target, friends, foes):
+      target = Ability.applyTo(self, target, friends, foes);
+      if (target == None):
+        return None;
+    
+      target.hp = 0;
+      
+      self.msg = "* %s MAPS %s, rendering it useless."%(str(self.owner), str(target));
+      
+      return target;
+      
+class DisarmTrap(Ability):
+    def __init__(self, owner):
+      Ability.__init__(self, owner);
+      self.targetType = ArrowSlit;
+#      self.frequency = "0.90";
+    
+    def applyTo(self, target, friends, foes):
+      target = Ability.applyTo(self, target, friends, foes);
+      if (target == None):
+        return None;
+    
+      target.hp = 0;
+      
+      self.msg = "* %s DISABLES %s, rendering it useless."%(str(self.owner), str(target));
+      
+      return target;
+  
