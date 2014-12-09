@@ -4,12 +4,12 @@ import towers;
 class Ability(object):
   def __init__(self, owner):
     self.targetType = None;
-    self.group = "foes"; # friends/foes
+    self.group = "foes"; # friends/foes/traps
     self.frequency = "battle"; # battle/constant/# for uses/0.# for probability
     self.owner = owner;
     
-  def applyTo(self, target, friends, foes):
-    if (not self.isApplicable(target, friends, foes)):
+  def applyTo(self, target, friends, foes,  traps=[]):
+    if (not self.isApplicable(target, friends, foes,  traps)):
       # DEBUG LINES
       #print "Not applicable to " + type(target).__name__ + " in " +\
     #self.group + " group.";
@@ -19,7 +19,7 @@ class Ability(object):
       #str(target) + ".";
     return target;
   
-  def isApplicable(self, target, friends, foes):
+  def isApplicable(self, target, friends, foes,  traps=[]):
     # DEBUG LINES
     #print "Self.group:" + str(eval(self.group));
     return isinstance(target, self.targetType) and (target in eval(self.group));
@@ -37,7 +37,7 @@ class Heal(Ability):
     Ability.__init__(self, owner);
     self.targetType =soldiers.SoldierClass;
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, friends, foes);
     if (target == None):
       return target;
@@ -51,7 +51,7 @@ class Harm(Ability):
     Ability.__init__(self, owner);
     self.targetType = soldiers.SoldierClass;
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -66,7 +66,7 @@ class Haste(Ability):
     Ability.__init__(self, owner);
     self.targetType =soldiers.SoldierClass;
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -80,7 +80,7 @@ class Slow(Ability):
     Ability.__init__(self, owner);
     self.targetType =soldiers.SoldierClass;
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -95,7 +95,7 @@ class DustToDust(Ability):
     Ability.__init__(self, owner);
     self.targetType = towers.TowerClass;
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -111,7 +111,7 @@ class BowAttack(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "2";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -127,7 +127,7 @@ class DaggerThrownAttack(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "5";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -143,7 +143,7 @@ class CriticalAttack(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "0.1";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -159,7 +159,7 @@ class CharmFoe(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "0.05";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -177,7 +177,7 @@ class Rage(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "constant";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -195,7 +195,7 @@ class Exhaust(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "0.10";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -211,7 +211,7 @@ class Poison(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "0.20";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -230,7 +230,7 @@ class Disease(Ability):
     self.targetType = soldiers.SoldierClass;    
     self.frequency = "0.20";
     
-  def applyTo(self, target, friends, foes):
+  def applyTo(self, target, friends, foes,  traps=[]):
     target = Ability.applyTo(self, target, friends, foes);
     if (target == None):
       return None;
@@ -246,10 +246,11 @@ from traps import *;
 class MapLabyrinth(Ability):
     def __init__(self, owner):
       Ability.__init__(self, owner);
-      self.targetType = traps.Labyrinth;
-#      self.frequency = "0.90";
+      self.targetType = Labyrinth;
+      self.group = "traps";
+      self.frequency = "0.90";
     
-    def applyTo(self, target, friends, foes):
+    def applyTo(self, target, friends, foes,  traps):
       target = Ability.applyTo(self, target, friends, foes);
       if (target == None):
         return None;
@@ -264,16 +265,35 @@ class DisarmTrap(Ability):
     def __init__(self, owner):
       Ability.__init__(self, owner);
       self.targetType = ArrowSlit;
-#      self.frequency = "0.90";
+      self.group = "traps";
+      self.frequency = "0.90";
     
-    def applyTo(self, target, friends, foes):
-      target = Ability.applyTo(self, target, friends, foes);
+    def applyTo(self, target, friends, foes,  traps):
+      target = Ability.applyTo(self, target, friends, foes,  traps);
       if (target == None):
         return None;
     
       target.hp = 0;
       
       self.msg = "* %s DISABLES %s, rendering it useless."%(str(self.owner), str(target));
+      
+      return target;
+  
+class BridgeGap(Ability):
+    def __init__(self, owner):
+      Ability.__init__(self, owner);
+      self.targetType = Pit;
+      self.group = "traps";
+      self.frequency = "0.90";
+    
+    def applyTo(self, target, friends, foes,  traps):
+      target = Ability.applyTo(self, target, friends, foes,  traps);
+      if (target == None):
+        return None;
+    
+      target.hp = 0;
+      
+      self.msg = "* %s COVERS %s, rendering it useless."%(str(self.owner), str(target));
       
       return target;
   

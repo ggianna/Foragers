@@ -17,6 +17,7 @@ class SoldierClass(object):
         self.resistances = [];
         self.immunities = [];
         self.damageType = "physical";
+        
         # TODO: Check what to do with gameMap
         self.strategy = UnitStrategyClass(economy,  self,  gameMap.homePos);
         
@@ -25,6 +26,7 @@ class SoldierClass(object):
         
         self.fullness = 100;
         self.treasure = 0;
+        self.score = 0.0;
         
         self.economy = economy;
         self.gameMap = gameMap;
@@ -67,7 +69,7 @@ class SoldierClass(object):
                 game.output.log("\n\n!!! Interacted with trap %s."%(str((curTrap.x,  curTrap.y))));
                 ##########
                 
-                if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes):
+                if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes,  [curTrap]):
                   return;
                 
         if len(lFoes) > 0:
@@ -125,9 +127,9 @@ class KnightClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " k ";
+            return " K ";
         if (self.currentHp < 0.5 * self.hp):
-            return "_k_";
+            return "_K_";
         return "/K\\";
 
 class BarbarianClass(SoldierClass):
@@ -170,7 +172,7 @@ class MageClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " m ";
+            return " M ";
         if (self.currentHp < 0.5 * self.hp):
             return "_M_";
         return "/M\\";
@@ -191,12 +193,12 @@ class DruidClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " d ";
+            return " D ";
         if (self.currentHp < 0.5 * self.hp):
             return "_D_";
         return "/D\\";
 
-class ArchmageClass(SoldierClass):
+class WizardClass(SoldierClass):
     def __init__(self,  economy,  gameMap):
         SoldierClass.__init__(self, economy, gameMap);
         
@@ -213,10 +215,10 @@ class ArchmageClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " a ";
+            return " W ";
         if (self.currentHp < 0.5 * self.hp):
-            return "_A_";
-        return "/A\\";
+            return "_W_";
+        return "/W\\";
 
 class RangerClass(SoldierClass):
     def __init__(self,  economy,  gameMap):
@@ -234,7 +236,7 @@ class RangerClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " r ";
+            return " R ";
         if (self.currentHp < 0.5 * self.hp):
             return "_R_";
         return "/R\\";
@@ -255,7 +257,7 @@ class AssassinClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " x ";
+            return " X ";
         if (self.currentHp < 0.5 * self.hp):
             return "_X_";
         return "/X\\";
@@ -299,10 +301,10 @@ class TechnicianClass(SoldierClass):
         if (self.currentHp < 0.3 * self.hp):
             return " t ";
         if (self.currentHp < 0.5 * self.hp):
-            return "_T_";
-        return "/T\\";
+            return "_t_";
+        return "/t\\";
 
-class ChartographerClass(SoldierClass):
+class CartographerClass(SoldierClass):
     def __init__(self,  economy,  gameMap):
         SoldierClass.__init__(self, economy, gameMap);
         
@@ -318,7 +320,28 @@ class ChartographerClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " t ";
+            return " c ";
         if (self.currentHp < 0.5 * self.hp):
-            return "_T_";
-        return "/T\\";
+            return "_c_";
+        return "/c\\";
+
+class BridgeBuilderClass(SoldierClass):
+    def __init__(self,  economy,  gameMap):
+        SoldierClass.__init__(self, economy, gameMap);
+        
+        self.attack *= 0.60;
+        self.attackSpeed *= 0.40;
+        self.hp *= 0.90;
+        self.damageType = "physical";
+        self.defence *= 0.60;
+        self.abilities += [BridgeGap(self)];
+
+        self.currentHp = self.hp;
+        self.currentMp = self.mp;
+
+    def __str__(self):
+        if (self.currentHp < 0.3 * self.hp):
+            return " b ";
+        if (self.currentHp < 0.5 * self.hp):
+            return "_b_";
+        return "/b\\";

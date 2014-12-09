@@ -6,15 +6,18 @@ class UnitStrategyClass(object):
   
   def __init__(self, economy, owner, homePos):
     self.riskiness = {"SoldierClass": 0.1, "TrapClass": 0.1, "TowerClass": 0.1}; # Base probability to get closer to interact
-    self.curiosity = 0.50; # TODO: Base probability to explore new territory
-    self.groupSpirit = 0.50; # Base probability to keep close to others
-    self.fasting = 0.30; # Base probability to return if hungry
+    self.curiosity = 0.10; # TODO: Base probability to explore new territory
+    self.groupSpirit = 0.30; # Base probability to keep close to others
+    self.fasting = 0.10; # Base probability to return if hungry
     self.greed = 0.90; # Base probability to reach  for loot, when not enough has been collected
     self.spontaneity = 0.05; # Base probability to act without checking/thinking
+    self.repetition = 0.20;  # Base probability to get back to one's last position
     
     self.owner = owner;
     self.economy = economy;
     self.homePos = homePos;
+    
+    self.lastDirection = None;
   
   # Returns the offset for the unit movement
   def decideMove(self, friends, foes, gamemap):
@@ -67,6 +70,18 @@ class UnitStrategyClass(object):
     # Do we miss home because of hunger?
     if self.owner.fullness <= self.distanceFromHome():
       directionScores[self.directionForPosition(self.homePos).tuple()] += self.fasting;
+      
+    # Are we against going back to our last position?
+    if (self.lastDirection != None):
+      if (random.random() >= self.repetition):
+        reverseOfLastDirection = (-self.lastDirection[0],  -self.lastDirection[1]);
+        # DEBUG LINES
+#        print("Reducing direction %s from %4.2f to zero."%(str(reverseOfLastDirection),  
+#          directionScores[reverseOfLastDirection] ));
+#        raw_input();
+        
+        directionScores[reverseOfLastDirection] = 0.0;
+      
  
     # DEBUG LINES
 #    sScores = '\n'.join([str(key)+":" + str(val) for key,  val in directionScores.iteritems()]);
@@ -127,7 +142,9 @@ class UnitStrategyClass(object):
       if curDirection[1] < 0:  curDirection= (curDirection[0],  0);
       
     
-
+    # Save selected direction
+    self.lastDirection = curDirection;
+    
     return curDirection;
 
   # The list of treasures in sight

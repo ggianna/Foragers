@@ -33,16 +33,18 @@ class Game(object):
       output.dump();
       
       aUnitPool = [
-#      "ArchmageClass",  
 #      "AssassinClass", 
 #      "BarbarianClass",
+        "CartographerClass", 
 #      "DruidClass",  
 #      "EnchanterClass", 
 #      "KnightClass",  
 #      "MageClass",  
 #      "RangerClass", 
 #      "SoldierClass"
-        "TechnicianClass"
+        "TechnicianClass", 
+        "BridgeBuilderClass", 
+#      "WizardClass",  
       ];
       while (curMoney > 0):
           curChoice = random.choice(aUnitPool);
@@ -102,28 +104,38 @@ class Game(object):
     output.drawMap(self.gameMap,  self.aAttackers,  [], 
       self.attackerColor,  "");
 
-  def interactWithTrap(self,  actor,  trap,  friends,  foes):
-      self.act(actor,  trap,  friends,  foes);
+  def interactWithTrap(self,  actor,  trap,  friends,  foes,  traps=[]):
+      self.act(actor,  trap,  friends,  foes,  traps);
       self.act(trap,  actor,  [],  [actor]);
       
       if (trap.hp <= 0):
         self.gameMap.traps.remove(trap);
+        # Reward actor
+        actor.score += self.economy.trapValue(trap);
 
       return actor.currentHp > 0;
 
   def interactWithTreasure(self,  actor,  treasure,  friends,  foes):
       treasure.applyEffectTo(actor);
       self.gameMap.treasures.remove(treasure);
+      # Reward actor
+      actor.score += self.economy.treasureValue(treasure);
       
       return True;
       
   def interactWithFoe(self,  actor, foe,  friends,  foes):
       self.act(actor,  foe,  friends,  foes);
       self.act(foe,  actor,  foes,  friends);
-      
+
+      if foe.hp < 0:
+        # Enemy died
+        foes.remove(foe);
+        # Reward actor
+        actor.score += self.economy.cost(foe);
+
       return actor.currentHp > 0;
       
-  def act(self, actor, target,  friends, foes):     
+  def act(self, actor, target,  friends, foes,  traps = []):
       if (actor is SoldierClass):
         output.color(actor.color);
       
@@ -135,55 +147,60 @@ class Game(object):
           # DEBUG LINES
           #output.log("Ability group:" + aCurAbility.group);
           
-          if isinstance(target,  TrapClass):
-            print "Found TRAP!";
-            foe = target;
-            raw_input();
+          foe = None;
+          if aCurAbility.group == "traps":
+            if target in traps:
+              foe = target;
+            # DEBUG LINES
+#            print "Found TRAP!";
+#            raw_input();
           else:
             if aCurAbility.group == "foes":
               if target in foes:
                   foe = target;
-              else:
-                  continue;
-              
-            # Check probability for probability-based abilities
-            try:
-               if (float(aCurAbility.frequency) > 0) and (float(aCurAbility.frequency) < 1):                  
-                  fCurProbability = float(aCurAbility.frequency);
-                  fRoll = random.random();
-                  if  fRoll <= fCurProbability:
-                      # DEBUG LINES
-                      # output.log("Rolled %4.2f with a chance of %4.2f"%(fRoll,  fCurProbability));
-                      
-                      if (aCurAbility.applyTo(foe, friends, foes) != None):
-                          output.log(str(aCurAbility));
-                  continue;
-            except:
-              # DEBUG LINES
-              #output.log("\n" + str(aCurAbility) + "\n");
-              pass; # Ignore
-
-            # Try to apply ability for other types of frequency
-            if (aCurAbility.applyTo(foe, friends, foes) != None):
-              output.log(str(aCurAbility));
-            else:
-                # DEBUG LINES
-                print "Could not use " + str(type(aCurAbility));
+                  
+          # If not applicable as a foe or trap    
+          if (foe == None):
+            continue;
             
-            # Remove battle abilities
-            if aCurAbility.frequency == "battle": 
-                actor.abilities.remove(aCurAbility);
-            # Decrease (and possibly remove) abilities with uses
-            try:
-                if (int(aCurAbility.frequency) >= 1):
-                  iCurUses = int(aCurAbility.frequency);
-                  iCurUses -= 1;
-                  if iCurUses == 0:
-                      actor.abilities.remove(aCurAbility);
-                  else:
-                      aCurAbility.frequency = str(iCurUses);
-            except:
-              pass; # Ignore
+          # Check probability for probability-based abilities
+          try:
+             if (float(aCurAbility.frequency) > 0) and (float(aCurAbility.frequency) < 1):                  
+                fCurProbability = float(aCurAbility.frequency);
+                fRoll = random.random();
+                if  fRoll <= fCurProbability:
+                    # DEBUG LINES
+                    #output.log("Rolled %4.2f with a chance of %4.2f"%(fRoll,  fCurProbability));
+                    
+                    if (aCurAbility.applyTo(foe, friends, foes) != None):
+                        output.log(str(aCurAbility));
+                continue;
+          except:
+            # DEBUG LINES
+            #output.log("\n" + str(aCurAbility) + "\n");
+            pass; # Ignore
+
+          # Try to apply ability for other types of frequency
+          if (aCurAbility.applyTo(foe, friends, foes,  traps) != None):
+            output.log(str(aCurAbility));
+#          else:
+#              # DEBUG LINES
+#              print "Could not use " + str(type(aCurAbility));
+          
+          # Remove battle abilities
+          if aCurAbility.frequency == "battle": 
+              actor.abilities.remove(aCurAbility);
+          # Decrease (and possibly remove) abilities with uses
+          try:
+              if (int(aCurAbility.frequency) >= 1):
+                iCurUses = int(aCurAbility.frequency);
+                iCurUses -= 1;
+                if iCurUses == 0:
+                    actor.abilities.remove(aCurAbility);
+                else:
+                    aCurAbility.frequency = str(iCurUses);
+          except:
+            pass; # Ignore
 
       # Deal damage, if target is still a foe
       if target in foes:
