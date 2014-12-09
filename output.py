@@ -6,17 +6,35 @@ from gamemap import GameMap;
 
 class Output(object):
   def __init__(self):
+    self.lastMessages = [];
     self.msg = "";
     self.nextColor = None;
+    self.maxMessages = 10;
   
   def log(self, msg):
+    msg = msg.strip();
+    
+    if (len(msg) == 0):
+      return;
+      
     if (self.nextColor == None):
       self.msg += msg;
+      self.lastMessages += [msg];
     else:
       self.msg += colored(msg, self.nextColor);
+      self.lastMessages += [colored(msg, self.nextColor)];
+    
+    if (len(self.lastMessages) > self.maxMessages):
+      self.lastMessages = self.lastMessages[-self.maxMessages:];
     
   def dump(self):
-    print self.msg;
+    # DEBUG LINES
+#    print "Messages %d"%(len(self.lastMessages));
+    # Keep 5 last messages
+    if (len(self.lastMessages) > self.lastMessages):
+      self.lastMessages = self.lastMessages[-self.lastMessages:];
+      
+    print "\n".join(self.lastMessages);
     self.msg = "";
     
   def write(self):
@@ -27,6 +45,7 @@ class Output(object):
     
   def clear(self):
     self.msg = "";
+    self.lastMessages = [];
 
   def color(self, sColor = None):
     self.nextColor = sColor;

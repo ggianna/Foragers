@@ -20,7 +20,7 @@ class Economy(object):
         
         iBaseCost += (trap.hp * trap.defence) * (1.0 + \
         (len(trap.resistances) / 4.0) - (len(trap.vulnerabilities) / 4.0)) * \
-        (len(trap.immtrapies)) + (trap.mp);
+        (len(trap.immunities)) + (trap.mp);
         iBaseCost += (trap.attack * trap.attackSpeed) * (1.0 + (len(trap.abilities) / 4.0));
         
         return iBaseCost;

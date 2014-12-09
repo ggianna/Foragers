@@ -59,14 +59,14 @@ class SoldierClass(object):
         # Decide move
         mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
         # DEBUG LINES
-        game.output.log("Moving:" + str(mMove));
+#        game.output.log("Moving:" + str(mMove));
         ##########
         self.move(mMove);
         
         if len(lTraps) > 0:
             for curTrap in lTraps:
                 # DEBUG LINES
-                game.output.log("\n\n!!! Interacted with trap %s."%(str((curTrap.x,  curTrap.y))));
+#                game.output.log("\n\n!!! Interacted with trap %s."%(str((curTrap.x,  curTrap.y))));
                 ##########
                 
                 if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes,  [curTrap]):
@@ -75,7 +75,7 @@ class SoldierClass(object):
         if len(lFoes) > 0:
             for curTFoe in lFoes:
                 # DEBUG LINES
-                game.output.log("\nBattled foe!");
+#                game.output.log("\nBattled foe!");
                 ##########
                 if not game.interactWithFoe(self,  curFoe,  lFriends,  lFoes):
                   return;
@@ -83,7 +83,7 @@ class SoldierClass(object):
         if len(lTreasures) > 0:
             for curTreasure in lTreasures:
                 # DEBUG LINES
-                game.output.log("\nGot treasure %s!!!"%(str((curTreasure.x,  curTreasure.y))));
+#                game.output.log("\nGot treasure %s!!!"%(str((curTreasure.x,  curTreasure.y))));
                 ##########
                 if not game.interactWithTreasure(self,  curTreasure,  lFriends,  lFoes):
                   return;

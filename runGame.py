@@ -7,7 +7,7 @@ import time;
 import math;
 import random;
 import gamemap;
-from pprint import pformat
+#from pprint import pformat
 
 #import pygame;
 #from pygame.locals import *;
@@ -33,18 +33,18 @@ class Game(object):
       output.dump();
       
       aUnitPool = [
-#      "AssassinClass", 
-#      "BarbarianClass",
+      "AssassinClass", 
+      "BarbarianClass",
         "CartographerClass", 
-#      "DruidClass",  
-#      "EnchanterClass", 
-#      "KnightClass",  
-#      "MageClass",  
-#      "RangerClass", 
-#      "SoldierClass"
+      "DruidClass",  
+      "EnchanterClass", 
+      "KnightClass",  
+      "MageClass",  
+      "RangerClass", 
+      "SoldierClass", 
         "TechnicianClass", 
         "BridgeBuilderClass", 
-#      "WizardClass",  
+      "WizardClass",  
       ];
       while (curMoney > 0):
           curChoice = random.choice(aUnitPool);
@@ -90,11 +90,9 @@ class Game(object):
         actualDefence = oTo.defence * 0.5;
 
       dDmg = round(max(oFrom.attack * math.pow(1.05, (10 - actualDefence)), 1.0));
-      output.log("Target is hit for " + str(dDmg) + " damage.");
-
       oTo.currentHp -= dDmg;
-      output.log("Target has now " + str(oTo.currentHp)+ " hit points left...");
-      
+      output.log("Target is hit for %d damage. %d hit points remaining."%(dDmg,  oTo.currentHp));
+
       return oTo;
 
   def printGameState(self):
@@ -106,12 +104,13 @@ class Game(object):
 
   def interactWithTrap(self,  actor,  trap,  friends,  foes,  traps=[]):
       self.act(actor,  trap,  friends,  foes,  traps);
-      self.act(trap,  actor,  [],  [actor]);
-      
       if (trap.hp <= 0):
         self.gameMap.traps.remove(trap);
         # Reward actor
         actor.score += self.economy.trapValue(trap);
+      else:
+        self.act(trap,  actor,  [],  [actor]);
+      
 
       return actor.currentHp > 0;
 
@@ -217,13 +216,13 @@ class Game(object):
     self.attackerColor = "white";
     
     # Init map
-    self.economy = Economy(500);
+    self.economy = Economy(5000);
     self.gameMap = gamemap.GameMap(self.economy, 20, 20);
     
-
     self.aAttackers = self.selectArmy(self.economy);
+    self.dead = [];
     output.dump();
-    time.sleep(0.5);
+    time.sleep(0.2);
     
     # Position armies
     iX = 0; iY = 2;
@@ -247,6 +246,8 @@ class Game(object):
         bShouldRepaint = False;
         
         iGameTime += 1; # Next moment
+        if (iGameTime % 100 == 0):
+          output.log("The time is now %d..."%(iGameTime));
         self.gameTime = iGameTime;        
         bEndConditions = False;
         
@@ -261,20 +262,22 @@ class Game(object):
               # Reduce fullness
               cCurAttacker.fullness -= 1;
               # DEBUG LINES
-              output.log("\n" + str(cCurAttacker) + "\n");
-              output.log(pformat(vars(cCurAttacker)) + "\n");
+#              output.log("\n" + str(cCurAttacker) + "\n");
+#              output.log(pformat(vars(cCurAttacker)) + "\n");
               bActed = True;
         
-        if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness == 0):
-            output.log(colored("\nAttacker", self.attackerColor) + " has died!");
-            self.aAttackers = aAttackers[1:];
-            bActed = True;
+            if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
+                output.log(colored("\nAttacker", self.attackerColor) + " has died!");
+                # Put to dead
+                self.dead += [aAttackers[0]];
+                self.aAttackers = aAttackers[1:];
+                bActed = True;
         
         if (bActed):
             self.repaintTerrain();
             output.log("\n");
             self.printGameState();
-            time.sleep(1);
+            time.sleep(0.3);
             iRowCnt += 1;
             if (iRowCnt >= 5 or bShouldRepaint):
                 if (bShouldRepaint):
@@ -282,13 +285,17 @@ class Game(object):
                     iRowCnt = 0;
                 
         # TODO: Remove
-        bEndConditions = (len(self.aAttackers) == 0);
+        bEndConditions = (len(self.aAttackers) == 0) or (iGameTime > 1000);
         # End of game
         if (bEndConditions):
             break;
 
     if (len(self.aAttackers) == 0):
         output.log("\n\nNo Attackers left! Defenders win!");
+    else:
+      output.log("Foraging complete! %d died and %d remain."%(len(self.dead),  len(self.aAttackers)));
+    
+    
 
     # Final output
     output.dump();

@@ -2,6 +2,18 @@ from math import *;
 from utils import *;
 import random;
 
+#class ProbGene(FloatGene):
+#    """
+#    Gene which represents the probabilities used in our organism
+#    """
+#    # genes get randomly generated within this range
+#    randMin = 0.0
+#    randMax = 1.0
+#    # probability of mutation
+#    mutProb = 0.1
+#    # degree of mutation
+#    mutAmt = 0.05
+
 class UnitStrategyClass(object):
   
   def __init__(self, economy, owner, homePos):
