@@ -73,7 +73,7 @@ class SoldierClass(object):
                   return;
                 
         if len(lFoes) > 0:
-            for curTFoe in lFoes:
+            for curFoe in lFoes:
                 # DEBUG LINES
 #                game.output.log("\nBattled foe!");
                 ##########

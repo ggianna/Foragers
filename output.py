@@ -5,6 +5,16 @@ import copy;
 from gamemap import GameMap;
 
 class Output(object):
+  def log(self, msg): pass;
+  def dump(self): pass
+  def write(self): pass
+  def writeln(self): pass
+  def clear(self): pass
+  def color(self,  sColor = None): pass
+  def drawMap(self,  mapToDraw,  attackers,  defenders,  trapColor = "red", 
+    treasureColor = "yellow", terrainColor = "green"): pass
+    
+class ConsoleOutput(Output):
   def __init__(self):
     self.lastMessages = [];
     self.msg = "";
@@ -51,8 +61,7 @@ class Output(object):
     self.nextColor = sColor;
     
 
-  def drawMap(self,  mapToDraw,  attackers,  defenders,  attackersColor,  defendersColor, 
-    trapColor = "red", treasureColor = "yellow", terrainColor = "green"):
+  def drawMap(self,  mapToDraw,  attackers,  defenders,  trapColor = "red", treasureColor = "yellow", terrainColor = "green"):
       # Clear screen
       Utils.cls();
       
@@ -65,22 +74,27 @@ class Output(object):
         for iCnt2 in range(0,  mapInstance.ySize):
           squareTreasures = mapInstance.getTreasures(iCnt, iCnt2);
           squareTraps = mapInstance.getTraps(iCnt, iCnt2);
+          squareFoes = mapInstance.getFoes(iCnt, iCnt2);
       
           # If treasure in square
           if (len(squareTreasures)) > 0:
             # Show the first
             mapInstance.squares[iCnt][iCnt2] = colored(str(squareTreasures[0]), treasureColor);
           else:
-            # If trap in square
-            if (len(squareTraps)) > 0:
+            if len(squareFoes) > 0:
               # Show the first
-              mapInstance.squares[iCnt][iCnt2] = colored(str(squareTraps[0]), trapColor);
+              mapInstance.squares[iCnt][iCnt2] = colored(str(squareFoes[0]), trapColor);
+            else:
+              # If trap in square
+              if (len(squareTraps)) > 0:
+                # Show the first
+                mapInstance.squares[iCnt][iCnt2] = colored(str(squareTraps[0]), trapColor);
           
       # Render soldiers
       for cItem in  attackers:
-          mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  attackersColor);
+          mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  cItem.color);
       for cItem in  defenders:
-          mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  defendersColor);
+          mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  cItem.color);
                 
       
       # Show map

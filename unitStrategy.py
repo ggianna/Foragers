@@ -1,6 +1,8 @@
 from math import *;
 from utils import *;
 import random;
+import soldiers;
+import towers;
 
 #class ProbGene(FloatGene):
 #    """
@@ -54,9 +56,9 @@ class UnitStrategyClass(object):
 #      print("\nFound %d foes in range.\n"%(len(lFoes)));    
       
       for curFoe in foes:
-        if (curFoe is SoldierClass):
+        if (isinstance(curFoe, soldiers.SoldierClass)):
           sCurClassName = "SoldierClass";     
-        if (curFoe is TowerClass):
+        if (isinstance(curFoe, towers.TowerClass)):
           sCurClassName = "TowerClass";
       
         directionScores[self.directionForPosition(curFoe).tuple()] += self.riskiness[sCurClassName] / len(lFoes);
@@ -127,18 +129,19 @@ class UnitStrategyClass(object):
       if directionScores[curCandidate] > curMax:
         curDirection = curCandidate;
         curMax = directionScores[curCandidate];
-    print("Max is:" + str(curMax) + " by " + str(curDirection));
+    # DEBUG LINES
+#    print("Max is:" + str(curMax) + " by " + str(curDirection));
 #    raw_input();
 
     # If we are about to stay put or we are spontaneous, choose randomly
     if random.random() < self.spontaneity:
-      print("Spontaneous reaction!");
+#      print("Spontaneous reaction!");
 #      raw_input();
       curDirection = random.choice(directionScores.keys());
       
     # If bored (same place)
     if curDirection == (0, 0):
-      print("Bored! Aiming for the end of the map...");
+#      print("Bored! Aiming for the end of the map...");
 #      raw_input();
       # aim for the end of the map
       curDirection = self.directionForPosition((gamemap.xSize,  gamemap.ySize)).tuple();

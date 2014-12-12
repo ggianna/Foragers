@@ -2,7 +2,7 @@
 from soldiers import *;
 from towers import *;
 from economy import Economy;
-from output import Output;
+from output import ConsoleOutput;
 import time;
 import math;
 import random;
@@ -16,16 +16,15 @@ from termcolor import colored;
 #from utils import Utils;
 
 
-# Init messaging
-output = Output();
-
 class Game(object):
     
-  def getInstanceOf(self,  sClassName):
-      return eval("soldiers." + sClassName +"(self.economy, self.gameMap)");
+  # Static method definitions
+  @staticmethod
+  def getInstanceOf(sClassName,  economy,  gameMap):
+      return eval("soldiers." + sClassName +"(economy, gameMap)");
       
-  # Method definitions
-  def selectArmy(self,  eEconomy):
+  @staticmethod
+  def selectArmy(eEconomy,  gameMap,  armyColor,  output):
       iTotalValue  = 0;
       aArmy = [];
       curMoney = eEconomy.maxMoney;
@@ -50,12 +49,12 @@ class Game(object):
           curChoice = random.choice(aUnitPool);
           
           # If we exceed our money
-          if (eEconomy.cost(self.getInstanceOf(curChoice)) > curMoney):
+          if (eEconomy.cost(Game.getInstanceOf(curChoice,  eEconomy,  gameMap)) > curMoney):
               curChoice = None;
               # Try linearly
               for cChoice in aUnitPool:
                 # If we have enough money
-                if eEconomy.cost(self.getInstanceOf(cChoice)) <= curMoney:
+                if eEconomy.cost(Game.getInstanceOf(cChoice,  eEconomy,  gameMap)) <= curMoney:
                     # buy the army
                     curChoice = cChoice;
               # If we found nothing we can afford
@@ -64,9 +63,9 @@ class Game(object):
                 # quit
                 return aArmy;
           # else buy the army
-          armyToAdd = self.getInstanceOf(curChoice);
+          armyToAdd = Game.getInstanceOf(curChoice,  eEconomy,  gameMap);
           # assign color
-          armyToAdd.color = self.attackerColor;
+          armyToAdd.color = armyColor;
           
           aArmy.append(armyToAdd);
           output.log("Selected %s for %d$. " %(str(curChoice),  eEconomy.cost(armyToAdd)));
@@ -75,7 +74,9 @@ class Game(object):
           iTotalValue += eEconomy.cost(armyToAdd);
       output.log("\nTotal army value: %d$\n"%(iTotalValue));
         
+  # Class method definitions
   def dealDamage(self, oFrom, oTo):
+      output = self.output;
       output.log("%s attacks %s with a %s attack.\t"%(str(oFrom),  str(oTo),  oFrom.damageType) );
       
       actualDefence = oTo.defence;
@@ -96,11 +97,10 @@ class Game(object):
       return oTo;
 
   def printGameState(self):
-      output.dump();
+      self.output.dump();
 
   def repaintTerrain(self):
-    output.drawMap(self.gameMap,  self.aAttackers,  [], 
-      self.attackerColor,  "");
+    self.output.drawMap(self.gameMap,  self.aAttackers,  []);
 
   def interactWithTrap(self,  actor,  trap,  friends,  foes,  traps=[]):
       self.act(actor,  trap,  friends,  foes,  traps);
@@ -135,6 +135,8 @@ class Game(object):
       return actor.currentHp > 0;
       
   def act(self, actor, target,  friends, foes,  traps = []):
+      output = self.output;
+      
       if (actor is SoldierClass):
         output.color(actor.color);
       
@@ -207,22 +209,24 @@ class Game(object):
       # Reset color 
       output.color();
     
-  def run(self):
+  def __init__(self,  economy,  gameMap,  army,  output,  msgBaseDelaySecs = 0.10):
+    # Init map
+    self.economy = economy;
+    self.gameMap = gameMap;
+    self.aAttackers = army;
     # Init output
     self.output = output;
+    self.msgBaseDelaySecs = msgBaseDelaySecs;
+    
+  def run(self):
+    output = self.output;
+    msgBaseDelaySecs = self.msgBaseDelaySecs;
+    
     output.log("Game begins!");
-    
-    # Set colors
-    self.attackerColor = "white";
-    
-    # Init map
-    self.economy = Economy(5000);
-    self.gameMap = gamemap.GameMap(self.economy, 20, 20);
-    
-    self.aAttackers = self.selectArmy(self.economy);
+        
     self.dead = [];
     output.dump();
-    time.sleep(0.2);
+    time.sleep(2 * msgBaseDelaySecs);
     
     # Position armies
     iX = 0; iY = 2;
@@ -233,10 +237,7 @@ class Game(object):
         if (iX == self.gameMap.xSize):
             iX = 0;
             iY += 1;
-
-
-
-
+            
     # Main game loop
     iGameTime = 0;
     self.repaintTerrain();
@@ -258,7 +259,7 @@ class Game(object):
         
         for cCurAttacker in aAttackers:
             if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
-              cCurAttacker.act(aAttackers,  [],  self);
+              cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
               # Reduce fullness
               cCurAttacker.fullness -= 1;
               # DEBUG LINES
@@ -267,7 +268,7 @@ class Game(object):
               bActed = True;
         
             if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
-                output.log(colored("\nAttacker", self.attackerColor) + " has died!");
+                output.log(colored("\nAttacker", aAttackers[0].color) + " has died!");
                 # Put to dead
                 self.dead += [aAttackers[0]];
                 self.aAttackers = aAttackers[1:];
@@ -277,11 +278,11 @@ class Game(object):
             self.repaintTerrain();
             output.log("\n");
             self.printGameState();
-            time.sleep(0.3);
+            time.sleep(3 * msgBaseDelaySecs);
             iRowCnt += 1;
             if (iRowCnt >= 5 or bShouldRepaint):
                 if (bShouldRepaint):
-                    time.sleep(1);
+                    time.sleep(10 * msgBaseDelaySecs);
                     iRowCnt = 0;
                 
         # TODO: Remove
@@ -290,6 +291,9 @@ class Game(object):
         if (bEndConditions):
             break;
 
+    dScore = self.getScore(iGameTime,  self.aAttackers);
+    output.log("Score: %d after %d time"%(dScore,  iGameTime));
+    
     if (len(self.aAttackers) == 0):
         output.log("\n\nNo Attackers left! Defenders win!");
     else:
@@ -299,7 +303,26 @@ class Game(object):
 
     # Final output
     output.dump();
-    
+    return dScore;
+
+  def getScore(self,  iGameTime,  aSurvivors):
+    dScore = iGameTime;
+    for curSurvivor in aSurvivors:
+      dScore += self.economy.cost(curSurvivor) + curSurvivor.score;
+    return dScore;
+
 if __name__ == "__main__":
-  g = Game();
+  # Init economy and map
+  economy = Economy(5000);
+  gameMap = gamemap.GameMap(economy, 20, 20);  
+  # Init messaging
+  output = ConsoleOutput();
+  # Init  army
+  # Set colors
+  sAttackerColor = "white";
+  army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output);
+  # Init game
+  g = Game(economy,  gameMap,  army,  output);
+    
+  
   g.run();

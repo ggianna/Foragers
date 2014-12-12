@@ -1,5 +1,5 @@
 class TowerClass(object):
-    def __init__(self):
+    def __init__(self,  economy,  gameMap):
         self.x = 0;
         self.y = 0;
         self.z = 0;
@@ -26,8 +26,8 @@ class TowerClass(object):
         return "|T|";
 
 class Fort(TowerClass):
-    def __init__(self):
-        TowerClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        TowerClass. __init__(self,  economy,  gameMap);
         
         self.hp *= 0.7;
         self.attack *= 0.5;
@@ -45,8 +45,8 @@ class Fort(TowerClass):
         return "|F|";
         
 class IllusionistTower(TowerClass):
-    def __init__(self):
-        TowerClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        TowerClass. __init__(self,  economy,  gameMap);
         
         self.hp *= 0.4;
         self.attack *= 1.5;
@@ -64,8 +64,8 @@ class IllusionistTower(TowerClass):
         return "|I|";
         
 class FireElementalistTower(TowerClass):
-    def __init__(self):
-        TowerClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        TowerClass. __init__(self,  economy,  gameMap);
         
         self.hp *= 0.4;
         self.attack *= 1.5;
@@ -84,8 +84,8 @@ class FireElementalistTower(TowerClass):
         
         
 class WaterElementalistTower(TowerClass):
-    def __init__(self):
-        TowerClass.__init__(self);
+    def __init__(self,  economy,  gameMap):
+        TowerClass. __init__(self,  economy,  gameMap);
         
         self.hp *= 0.4;
         self.attack *= 1.5;
