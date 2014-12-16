@@ -16,10 +16,19 @@ maps.
 * Create basic abilities - v0.2
 * Create a basic economy - v0.2
 * Create a game emulator (console) - v0.2
-* Define the genome for the population (and other genetic algorithms parameters)
+* Define the genome for the population (and other genetic algorithms parameters) - v0.3
 * Run emulator with the Genetic Algorithm to balance
 * Determine user intervention levels to genetic traits (i.e. soldier training)
 * Create map generators
-* Use graphics rendering
+* Use graphics rendering - v0.3
 * Create UI
 * Gametest till we drop...
+
+# Assets (tileset)
+Tileset taken from http://opengameart.org/content/32x32-fantasy-tileset (licensed as CC-BY-SA 3.0)
+and I created also a red (colorized) version (licensed as CC-BY-SA 3.0 as well).
+
+# Prerequisites
+pygene (you can download from GitHub at https://github.com/blaa/PyGene)
+pygame (you can download using pip)
+termcolor (you can download using pip)

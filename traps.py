@@ -21,11 +21,7 @@ class TrapClass(object):
         self.currentMp = 0;
 
     def __str__(self):
-        if (self.currentHp < 0.3 * self.hp):
-            return " _ ";
-        if (self.currentHp < 0.5 * self.hp):
-            return " ~ ";
-        return " # ";
+        return "###";
 
 class Pit(TrapClass):
     def __init__(self):
@@ -56,7 +52,7 @@ class Explosion(TrapClass):
       self.abilities = [Harm(self)];
 
     def __str__(self):
-        return "-^-";
+        return "-*-";
 
 class Labyrinth(TrapClass):
     def __init__(self):

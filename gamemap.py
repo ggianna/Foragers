@@ -62,15 +62,15 @@ class GameMap(object):
     def applyFoes(self, possibleFoes = ["FireElementalistTower",  "Fort", "TowerClass", 
         "IllusionistTower", "WaterElementalistTower", 
         "AssassinClass",  "BarbarianClass",
-        "CartographerClass", 
+#        "CartographerClass", 
       "DruidClass",  
       "EnchanterClass", 
       "KnightClass",  
       "MageClass",  
       "RangerClass", 
       "SoldierClass", 
-        "TechnicianClass", 
-        "BridgeBuilderClass", 
+#        "TechnicianClass", 
+#        "BridgeBuilderClass", 
       "WizardClass",  
                   ]):
         # Apply foes

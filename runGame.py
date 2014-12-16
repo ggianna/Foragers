@@ -24,14 +24,8 @@ class Game(object):
       return eval("soldiers." + sClassName +"(economy, gameMap)");
       
   @staticmethod
-  def selectArmy(eEconomy,  gameMap,  armyColor,  output):
-      iTotalValue  = 0;
-      aArmy = [];
-      curMoney = eEconomy.maxMoney;
-      output.log("\nStarting money:" + str(curMoney) + "$");
-      output.dump();
-      
-      aUnitPool = [
+  def selectArmy(eEconomy,  gameMap,  armyColor,  output,  
+    aUnitPool = [
       "AssassinClass", 
       "BarbarianClass",
         "CartographerClass", 
@@ -44,7 +38,14 @@ class Game(object):
         "TechnicianClass", 
         "BridgeBuilderClass", 
       "WizardClass",  
-      ];
+      ]):
+      iTotalValue  = 0;
+      aArmy = [];
+      curMoney = eEconomy.maxMoney;
+      output.log("\nStarting money:" + str(curMoney) + "$");
+      output.dump();
+      
+      
       while (curMoney > 0):
           curChoice = random.choice(aUnitPool);
           

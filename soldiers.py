@@ -105,9 +105,9 @@ class SoldierClass(object):
         
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " s ";
+            return " S ";
         if (self.currentHp < 0.5 * self.hp):
-            return "_s_";
+            return "_S_";
         return "/S\\";
 
         
@@ -278,7 +278,7 @@ class EnchanterClass(SoldierClass):
 
     def __str__(self):
         if (self.currentHp < 0.3 * self.hp):
-            return " e ";
+            return " E ";
         if (self.currentHp < 0.5 * self.hp):
             return "_E_";
         return "/E\\";

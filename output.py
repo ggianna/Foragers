@@ -41,8 +41,8 @@ class ConsoleOutput(Output):
     # DEBUG LINES
 #    print "Messages %d"%(len(self.lastMessages));
     # Keep 5 last messages
-    if (len(self.lastMessages) > self.lastMessages):
-      self.lastMessages = self.lastMessages[-self.lastMessages:];
+    if (len(self.lastMessages) > self.maxMessages):
+      self.lastMessages = self.lastMessages[-self.maxMessages:];
       
     print "\n".join(self.lastMessages);
     self.msg = "";

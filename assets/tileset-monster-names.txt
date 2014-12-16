@@ -1,0 +1,34 @@
+Monster Types
+
+    Rat
+    Spiders
+    Lizard
+    Spider Champion
+    Toad
+    Scarab
+    Centipede
+    Serpent
+    Mushroom
+    Hare
+    Bat
+    Bat Champion
+    Snake
+    Wolf
+    Wild Boar
+    Bear
+    Slimes
+    Slime Champion
+    Scorpion
+    Kraken
+    Vampire
+    Mummy
+    Wraith
+    Carabia
+    Goblin
+    Zombie
+    Undead
+    Orc
+    Cyclop
+    Werewolf
+    Werebear
+    Devil
