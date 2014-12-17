@@ -48,6 +48,10 @@ class SoldierOrganism(GenomeSplitOrganism):
       
       return s;
       
+    def getHelper(self,  economy,  gameMap):
+      s = SoldierClass(economy,  gameMap);
+      return s;
+      
     def fitness(self):
         """
         Implements the 'fitness function' for this species.
@@ -65,8 +69,9 @@ class SoldierOrganism(GenomeSplitOrganism):
         # Set colors
         sAttackerColor = "white";
         
-        NUMBER_OF_GAMES = 1;
-        NUMBER_OF_SOLDIERS = 5;
+        NUMBER_OF_GAMES = 10;
+        NUMBER_OF_SOLDIERS = 1;
+        NUMBER_OF_HELPERS = 3;
         avgScore = 0;
         for iGameCnt in range(NUMBER_OF_GAMES):
           # Init economy and map
@@ -74,6 +79,8 @@ class SoldierOrganism(GenomeSplitOrganism):
           gameMap = gamemap.GameMap(economy, 20, 20);
           # Get army
           army = [self.getSoldier(economy,  gameMap) for x in range(NUMBER_OF_SOLDIERS)];
+          army += [self.getHelper(economy,  gameMap) for x in range(NUMBER_OF_SOLDIERS)];
+          
           basePrice = NUMBER_OF_SOLDIERS * economy.cost(army[0]);
           
           for curSoldier in army: curSoldier.color = sAttackerColor;
