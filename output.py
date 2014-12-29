@@ -28,7 +28,7 @@ class ConsoleOutput(Output):
       return;
       
     if (self.nextColor == None):
-      self.msg += msg;
+      self.msg += "\n" + msg;
       self.lastMessages += [msg];
     else:
       self.msg += colored(msg, self.nextColor);
@@ -45,7 +45,7 @@ class ConsoleOutput(Output):
       self.lastMessages = self.lastMessages[-self.maxMessages:];
       
     print "\n".join(self.lastMessages);
-    self.msg = "";
+    #self.msg = "";
     
   def write(self):
     print Utils.padWithSpaces(self.msg, 79)[0:79],;
@@ -54,8 +54,13 @@ class ConsoleOutput(Output):
     print Utils.padWithSpaces(self.msg, 79)[0:79];
     
   def clear(self):
-    self.msg = "";
+    #self.msg = "";
     self.lastMessages = [];
+    
+  def saveToFile(self, sFilename):
+    fOut = open(sFilename, 'w')
+    fOut.write(self.msg)
+    fOut.close()
 
   def color(self, sColor = None):
     self.nextColor = sColor;

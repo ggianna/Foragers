@@ -1,12 +1,16 @@
 #!/usr/bin/python
 from pygene.gene import FloatGene
-from pygene.organism import GenomeSplitOrganism
+#from pygene.organism import GenomeSplitOrganism
+from pygene.organism import Organism
 from pygene.population import Population
 from runGame import Game;
 from economy import Economy;
 from soldiers import *;
 import gamemap;
-from output import Output;
+from output import Output, ConsoleOutput;
+
+from multiprocessing import Pool
+import numpy
 
 class ProbGene(FloatGene):
     """
@@ -20,9 +24,12 @@ class ProbGene(FloatGene):
     mutProb = 0.05
     
     # degree of mutation
-    mutAmt = 0.10
+    mutAmt = 0.25
+    
+def runGame(g):
+  return g.run()
 
-class SoldierOrganism(GenomeSplitOrganism):
+class SoldierOrganism(Organism):
     """
     Implements the organism which tries
     to survive in a game
@@ -30,8 +37,32 @@ class SoldierOrganism(GenomeSplitOrganism):
     genome = {'riskinessSoldierClass':ProbGene, 'riskinessTrapClass':ProbGene, 
       'riskinessTowerClass': ProbGene,  'curiosity':ProbGene,  'groupSpirit':ProbGene, 
       'fasting':ProbGene,  'greed':ProbGene,  'spontaneity':ProbGene, 'repetition':ProbGene};
+    economy = None
+    gameMap = None
+
+    def __init__(self, **kw):
+      try:
+	#print "Loading soldier class"
+	SoldierOrganism.soldierClass = kw.get("soldierClass")
+	del kw["soldierClass"]
+	#print "Done"
+      except:
+	print "Reverting to default class since no class was given for soldier organism."
+	SoldierOrganism.soldierClass = "SoldierClass"
+      super(SoldierOrganism, self).__init__(**self.genome)
+
     
-    soldierClass = 'SoldierClass';
+    def getGameMap(self, bReset = False):
+      if self.gameMap is None or bReset:
+	economy = self.getEconomy();
+	self.gameMap = gamemap.GameMap(economy, 10, 10);
+      return self.gameMap
+    
+    def getEconomy(self, bReset = False):
+      if self.economy is None or bReset:
+	self.economy = Economy(5000);
+      return self.economy
+
     
     def getSoldier(self,  economy,  gameMap):
       s = eval('%s(economy,  gameMap)'%(self.soldierClass));
@@ -52,6 +83,34 @@ class SoldierOrganism(GenomeSplitOrganism):
       s = SoldierClass(economy,  gameMap);
       return s;
       
+    # submit fitness calculation to worker process
+    def prepare_fitness(self):
+        self.NUMBER_OF_GAMES = 20;
+        self.NUMBER_OF_SOLDIERS = 1;
+        self.NUMBER_OF_HELPERS = 3;
+        self.results = []
+        
+        for iGameCnt in range(self.NUMBER_OF_GAMES):
+	  # Init messaging
+	  output = Output();
+	  # Init  army
+	  # Set colors
+	  sAttackerColor = "white";
+	  # Init economy and map
+	  economy = self.getEconomy(False);
+	  gameMap = self.getGameMap(True);
+	  # Get army
+	  army = [self.getSoldier(economy,  gameMap) for x in range(self.NUMBER_OF_SOLDIERS)];
+	  army += [self.getHelper(economy,  gameMap) for x in range(self.NUMBER_OF_HELPERS)];
+	    
+	  for curSoldier in army: curSoldier.color = sAttackerColor;
+	  # Init game
+	  g = Game(economy,  gameMap,  army,  output,  0.0);	  
+	  self.results.append(pool.apply_async(runGame, [g]))
+	  
+	  # DEBUG LINES
+	  #print len(self.results)
+    	
     def fitness(self):
         """
         Implements the 'fitness function' for this species.
@@ -63,36 +122,23 @@ class SoldierOrganism(GenomeSplitOrganism):
         except:
           pass
           
-        # Init messaging
-        output = Output();
-        # Init  army
-        # Set colors
-        sAttackerColor = "white";
+        scores = [];
+        for curRes in self.results:
+	  scores += [float(curRes.get())]
+	  # DEBUG LINES
+	  #print curRes.get()
+        # DEBUG LINES
+        #raw_input()
         
-        NUMBER_OF_GAMES = 10;
-        NUMBER_OF_SOLDIERS = 1;
-        NUMBER_OF_HELPERS = 3;
-        avgScore = 0;
-        for iGameCnt in range(NUMBER_OF_GAMES):
-          # Init economy and map
-          economy = Economy(5000);
-          gameMap = gamemap.GameMap(economy, 20, 20);
-          # Get army
-          army = [self.getSoldier(economy,  gameMap) for x in range(NUMBER_OF_SOLDIERS)];
-          army += [self.getHelper(economy,  gameMap) for x in range(NUMBER_OF_SOLDIERS)];
-          
-          basePrice = NUMBER_OF_SOLDIERS * economy.cost(army[0]);
-          
-          for curSoldier in army: curSoldier.color = sAttackerColor;
-          # Init game
-          g = Game(economy,  gameMap,  army,  output,  0.0);
-          self.game = g;
-          avgScore += self.game.run();
-        avgScore /= NUMBER_OF_GAMES;
         # Save avg score
-        self.avgScore = avgScore;
-        # Run evaluation (lower is better)
-        self.cachedFitness = (1000.0 + 5 * basePrice) / (avgScore + 1.0)
+        self.avgScore = numpy.percentile(scores, 0.33);
+	  
+	# Init economy and map
+	economy = self.getEconomy(False);
+	gameMap = self.getGameMap(True);
+	basePrice = self.NUMBER_OF_SOLDIERS * self.getEconomy(False).cost(self.getSoldier(economy,  gameMap));
+	# Calc evaluation (lower is better)
+	self.cachedFitness = (1000.0 + 5.0 * basePrice) / (self.avgScore + 1.0)
         return self.cachedFitness;
 
     def __repr__(self):
@@ -102,16 +148,22 @@ class SoldierOrganism(GenomeSplitOrganism):
             sPhenotype
             )
 
-class BridgeBuilderOrganism(SoldierOrganism):
-    soldierClass = 'BridgeBuilderClass';
-
 
 class SoldierPopulation(Population):
-    species = BridgeBuilderOrganism
+  
+    def __init__(self, *a, **kw):
+      # DEBUG LINES
+      #print str(kw.get("species"))
+      
+      super(SoldierPopulation, self).__init__(species=kw.get("species"))
+      #print "Done"
+      
+      
     initPopulation = 10
+    #species = SoldierOrganism
     
     # cull to this many children after each generation
-    childCull = 20
+    childCull = 10
 
     # number of children to create after each generation
     childCount = 10
@@ -121,13 +173,27 @@ class SoldierPopulation(Population):
     
 # now a func to run the population
 def main():
-    # create a new population, with randomly created members
-    pop = SoldierPopulation()
-    maxGens = 20;
+    # Init calculator pool
+    global pool
+    pool = Pool(processes=6)
+    # Create custom organism
+    class cLocalOrganism(SoldierOrganism):
+      def __init__(self, **kw):
+	super(cLocalOrganism, self).__init__(soldierClass='BarbarianClass', **kw)
+	
+    pop = SoldierPopulation((),species=cLocalOrganism)
+    #pop.setSpecies('localOrganism')
+    
+    # create a new population, with randomly created members        
+    maxGens = 10;
 
+    import time
+    lastTime = time.time()
+    
     try:
         generations = 0
         while True:
+	  
             # execute a generation
             pop.gen()
             generations += 1
@@ -136,13 +202,38 @@ def main():
             #print [("%.2f %.2f" % (o['x1'], o['x2'])) for o in pop.organisms]
             best = pop.organisms[0]
             print("fitness=%4.2f %s" % (best.get_fitness(), str(best)))
+	    print "Generation running time %d secs"%(time.time() - lastTime)
+	    lastTime = time.time()
             if best.get_fitness() < 0.10 or generations >= maxGens:
                 break
+
 
     except KeyboardInterrupt:
         pass
     print("Executed", generations, "generations")
+    print("on species ", str(pop.species.soldierClass))
+    print("best soldier ", str(best.getSoldier(None, None)))
+    print("with genome ",str(best))
 
+    print "Running emulation..."
+    # Init economy and map
+    economy = best.getEconomy(False);
+    gameMap = best.getGameMap(True);
+    output = ConsoleOutput();
+    # Get army
+    army = [best.getSoldier(economy,  gameMap) for x in range(best.NUMBER_OF_SOLDIERS)];
+    army += [best.getHelper(economy,  gameMap) for x in range(best.NUMBER_OF_HELPERS)];
+      
+    # Set colors
+    sAttackerColor = "white";
+    for curSoldier in army: curSoldier.color = sAttackerColor;
+    # Init game
+    g = Game(economy,  gameMap,  army,  output,  0.1);	  
+    resScore = runGame(g)
+    print "Final score:" + str(resScore)
+    print "Expected:" + str(best)
+    output.saveToFile("logBest.txt")
+    
 
 if __name__ == '__main__':
     main()

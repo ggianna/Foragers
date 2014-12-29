@@ -5,6 +5,18 @@ class Barracks(object):
     self.mapSize = 10
     self.improvement = {"hp": 0.05, "attackSpeed": 0.05, "attack" : 0.05, "defence" : 0.05}
     self.newAbilities = []
+    
+  def train(self, army):
+    # Keep first [capacity] soldiers to train
+    armyToTrain = army[0:self.capacity]
+    
+    # For each army soldier
+    for sCur in army:
+      # Improve army through real game
+      # If roll is low enough
+	# apply improvemnts
+	
+      
 
 class GladiatorPit(Barracks):
   def __init__(self):

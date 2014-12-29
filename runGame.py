@@ -78,7 +78,7 @@ class Game(object):
   # Class method definitions
   def dealDamage(self, oFrom, oTo):
       output = self.output;
-      output.log("%s attacks %s with a %s attack.\t"%(str(oFrom),  str(oTo),  oFrom.damageType) );
+      output.log("%s attacks %s with a %s attack.\t"%(str(oFrom) + str(id(oFrom))[:-3],  str(oTo) + str(id(oTo))[:-3],  oFrom.damageType) );
       
       actualDefence = oTo.defence;
       
@@ -115,6 +115,11 @@ class Game(object):
 
       return actor.currentHp > 0;
 
+  def interactWithHome(self,  actor):
+    actor.fullness = 100;
+    self.output.log(str(actor) + " got provisions!")
+    return True
+    
   def interactWithTreasure(self,  actor,  treasure,  friends,  foes):
       treasure.applyEffectTo(actor);
       self.gameMap.treasures.remove(treasure);
@@ -124,14 +129,11 @@ class Game(object):
       return True;
       
   def interactWithFoe(self,  actor, foe,  friends,  foes):
+      # DEBUG LINES
+      #output.log(str(actor) + " in " + str(actor.x) + ","  + str(actor.y) + " attacks \n\t" +  str(foe))
+      
       self.act(actor,  foe,  friends,  foes);
-      self.act(foe,  actor,  foes,  friends);
 
-      if foe.hp < 0:
-        # Enemy died
-        foes.remove(foe);
-        # Reward actor
-        actor.score += self.economy.cost(foe);
 
       return actor.currentHp > 0;
       
@@ -255,25 +257,40 @@ class Game(object):
         
         # Local vars
         aAttackers = self.aAttackers;
+        aDefenders = self.gameMap.foes
         
         bActed = False;
         
+        # Check attackers
         for cCurAttacker in aAttackers:
-            if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
-              cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
-              # Reduce fullness
-              cCurAttacker.fullness -= 1;
+            if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
+                output.log(colored("\nAttacker", cCurAttacker.color) + str(id(cCurAttacker)) + " has died!");
+                if cCurAttacker.fullness <= 0:
+		  output.log("...in fact it was STARVATION...");
+                # Put to dead
+                self.dead += [(aAttackers[0], iGameTime)];
+                self.aAttackers = aAttackers[1:];
+                bActed = True;
+            else:
+	      if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
+		# Reduce fullness
+		cCurAttacker.fullness -= 1;
+		bActed = cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
+              
               # DEBUG LINES
 #              output.log("\n" + str(cCurAttacker) + "\n");
 #              output.log(pformat(vars(cCurAttacker)) + "\n");
-              bActed = True;
         
-            if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
-                output.log(colored("\nAttacker", aAttackers[0].color) + " has died!");
-                # Put to dead
-                self.dead += [aAttackers[0]];
-                self.aAttackers = aAttackers[1:];
-                bActed = True;
+        
+        # Also check defenders
+        for cCurDefender in filter(lambda x: isinstance(x, SoldierClass), aDefenders):
+            if (cCurDefender.currentHp <= 0):
+	      output.log("\nDefender" + str(id(cCurDefender)) + " has died!");
+	      self.gameMap.foes.remove(cCurDefender)
+	      bActed = True
+	    else:
+	      if (iGameTime % round(1000.0 / cCurDefender.attackSpeed)) == 0:
+		bActed = bActed or cCurDefender.act(aDefenders,  aAttackers,  self, False); # Cannot move around
         
         if (bActed):
             self.repaintTerrain();
@@ -292,7 +309,7 @@ class Game(object):
         if (bEndConditions):
             break;
 
-    dScore = self.getScore(iGameTime,  self.aAttackers);
+    dScore = self.getScore(iGameTime,  self.aAttackers, self.dead);
     output.log("Score: %d after %d time"%(dScore,  iGameTime));
     
     if (len(self.aAttackers) == 0):
@@ -306,24 +323,28 @@ class Game(object):
     output.dump();
     return dScore;
 
-  def getScore(self,  iGameTime,  aSurvivors):
+  def getScore(self,  iGameTime,  aSurvivors, aDead):
     dScore = iGameTime;
     for curSurvivor in aSurvivors:
       dScore += self.economy.cost(curSurvivor) + curSurvivor.score;
+    # Also take into account dead
+    for soldier,dieTime in self.dead:
+      dScore += soldier.score * float(dieTime) / float(iGameTime)
     return dScore;
 
 if __name__ == "__main__":
   # Init economy and map
   economy = Economy(5000);
-  gameMap = gamemap.GameMap(economy, 20, 20);  
+  gameMap = gamemap.GameMap(economy, 20, 20, 0.00, 0.10, 0.10, 0.00);  
   # Init messaging
   output = ConsoleOutput();
   # Init  army
   # Set colors
   sAttackerColor = "white";
-  army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output);
+  army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output, ['BarbarianClass']);
   # Init game
-  g = Game(economy,  gameMap,  army,  output);
+  g = Game(economy,  gameMap,  army,  output, 0.05);
     
   
   g.run();
+  g.output.saveToFile("log.txt")

@@ -183,9 +183,9 @@ class Rage(Ability):
       return None;
     
     self.owner.defence /= 1.0 + (self.owner.hp - self.owner.currentHp) / (5 * self.owner.hp);
-    self.owner.attack *= 1.0 + (self.owner.hp - self.owner.currentHp ) / (5 * self.owner.hp);
+    self.owner.attackSpeed *= 1.0 + (self.owner.hp - self.owner.currentHp ) / (20 * self.owner.hp);
     
-    self.msg = "* %s is enraged! Defense is increased. Now defence is %4.2f and attack is %4.2f."%(str(self.owner), self.owner.defence, self.owner.attack);
+    self.msg = "* %s is enraged! Defense is decreased. Attack speed is increased. Now defence is %4.2f and attack speed is %4.2f."%(str(self.owner), self.owner.defence, self.owner.attackSpeed);
     
     return target;
 

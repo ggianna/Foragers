@@ -2,6 +2,8 @@ from abilities import *;
 from unitStrategy import *;
 
 class SoldierClass(object):
+    fullness = 40;
+
     def __init__(self,  economy = None,  gameMap  = None):
         self.x = 0;
         self.y = 0;
@@ -19,12 +21,15 @@ class SoldierClass(object):
         self.damageType = "physical";
         
         # TODO: Check what to do with gameMap
-        self.strategy = UnitStrategyClass(economy,  self,  gameMap.homePos);
+        if gameMap is not None:
+	  self.strategy = UnitStrategyClass(economy,  self,  gameMap.homePos);
+	else:
+	  self.strategy = UnitStrategyClass(economy,  self,  (0,0));
         
         self.currentHp = self.hp;
         self.currentMp = self.mp;
         
-        self.fullness = 100;
+        self.fullness = SoldierClass.fullness;
         self.treasure = 0;
         self.score = 0.0;
         
@@ -49,7 +54,8 @@ class SoldierClass(object):
         
         return res;
 
-    def act(self,  friends,  foes,  game):
+    def act(self,  friends,  foes,  game, canMove = True):
+        bActed = False
         
         lTraps = self.gameMap.getTraps(self.x,  self.y);
         lTreasures = self.gameMap.getTreasures(self.x,  self.y);
@@ -57,7 +63,11 @@ class SoldierClass(object):
         lFriends = self.friendsNear(friends,  foes);
         
         # Decide move
-        mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
+        if canMove:
+	  mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
+	  bActed = True
+	else:
+	  mMove = (0,0)
         # DEBUG LINES
 #        game.output.log("Moving:" + str(mMove));
         ##########
@@ -70,7 +80,8 @@ class SoldierClass(object):
                 ##########
                 
                 if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes,  [curTrap]):
-                  return;
+		  bActed = True
+                  return bActed;
                 
         if len(lFoes) > 0:
             for curFoe in lFoes:
@@ -78,7 +89,8 @@ class SoldierClass(object):
 #                game.output.log("\nBattled foe!");
                 ##########
                 if not game.interactWithFoe(self,  curFoe,  lFriends,  lFoes):
-                  return;
+		  bActed = True
+                  return bActed;
                 
         if len(lTreasures) > 0:
             for curTreasure in lTreasures:
@@ -86,9 +98,16 @@ class SoldierClass(object):
 #                game.output.log("\nGot treasure %s!!!"%(str((curTreasure.x,  curTreasure.y))));
                 ##########
                 if not game.interactWithTreasure(self,  curTreasure,  lFriends,  lFoes):
-                  return;
+		  bActed = True
+                  return bActed;
 
-        
+        if self.x == self.gameMap.homePos[0] and self.y == self.gameMap.homePos[1]:
+	    if not game.interactWithHome(self):
+		  bActed = True
+                  return bActed;
+
+	return bActed
+    
     def move(self, moveTuple):
         self.move3D(moveTuple[0], moveTuple[1], 0);
         

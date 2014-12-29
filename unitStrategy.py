@@ -19,26 +19,29 @@ import towers;
 class UnitStrategyClass(object):
   
   def __init__(self, economy, owner, homePos):
-    self.riskiness = {"SoldierClass": 0.1, "TrapClass": 0.1, "TowerClass": 0.1}; # Base probability to get closer to interact
+    self.riskiness = {"SoldierClass": 0.5, "TrapClass": 0.25, "TowerClass": 0.1}; # Base probability to get closer to interact
     self.curiosity = 0.10; # TODO: Base probability to explore new territory
-    self.groupSpirit = 0.30; # Base probability to keep close to others
-    self.fasting = 0.10; # Base probability to return if hungry
-    self.greed = 0.90; # Base probability to reach  for loot, when not enough has been collected
+    self.groupSpirit = 0.50; # Base probability to keep close to others
+    self.fasting = 0.90; # Base probability to return if hungry
+    self.greed = 0.90; # Base probability to reach for loot, when not enough has been collected
     self.spontaneity = 0.05; # Base probability to act without checking/thinking
     self.repetition = 0.20;  # Base probability to get back to one's last position
-    
     self.owner = owner;
     self.economy = economy;
     self.homePos = homePos;
+    self.visited = [];
     
     self.lastDirection = None;
   
   # Returns the offset for the unit movement
   def decideMove(self, friends, foes, gamemap):
+    # Update current space as visited
+    self.visited += (self.owner.x,self.owner.y)
     # Init direction scores
     directionScores = {(-1,-1): 0.0, (0, -1): 0.0, (1, -1): 0.0,
                (-1, 0): 0.0, (0, 0) : 0.0, (1, 0) : 0.0,
                (-1, 1): 0.0, (0, 1) : 0.0, (1, 1) : 0.0};
+    bInBattle = False
     
     lFriends = self.friendsInSight(friends, foes);
     if len(lFriends) > 0:
@@ -60,8 +63,11 @@ class UnitStrategyClass(object):
           sCurClassName = "SoldierClass";     
         if (isinstance(curFoe, towers.TowerClass)):
           sCurClassName = "TowerClass";
-      
-        directionScores[self.directionForPosition(curFoe).tuple()] += self.riskiness[sCurClassName] / len(lFoes);
+	
+	foeDirection = self.directionForPosition(curFoe).tuple()
+	if (foeDirection == (0,0)):
+	  bInBattle = True
+        directionScores[foeDirection] += self.riskiness[sCurClassName] / len(lFoes);
     
     lTrapsInSight = self.trapsInSight(friends, foes, gamemap);
     # DEBUG LINES
@@ -95,6 +101,13 @@ class UnitStrategyClass(object):
 #        raw_input();
         
         directionScores[reverseOfLastDirection] = 0.0;
+
+    # Are we curious to visit new places?
+    if (random.random() <= self.curiosity):
+      for xInc in range(-1,2):
+	for yInc in range(-1,2):
+	  if (self.owner.x + xInc, self.owner.y + yInc) not in self.visited:
+	    directionScores[xInc, yInc] += 1.0
       
  
     # DEBUG LINES
@@ -109,7 +122,9 @@ class UnitStrategyClass(object):
     for key, val in directionScores.iteritems():
       if val < 0.0:
         directionScores[key] = 0.0;
-    
+    if bInBattle:
+      directionScores[0,0] += 1.0; # Increased importance if in bInBattle
+      
     # Follow probability
     curDirection = None;
     
@@ -140,11 +155,11 @@ class UnitStrategyClass(object):
       curDirection = random.choice(directionScores.keys());
       
     # If bored (same place)
-    if curDirection == (0, 0):
+    #if curDirection == (0, 0):
 #      print("Bored! Aiming for the end of the map...");
 #      raw_input();
       # aim for the end of the map
-      curDirection = self.directionForPosition((gamemap.xSize,  gamemap.ySize)).tuple();
+     # curDirection = self.directionForPosition((gamemap.xSize,  gamemap.ySize)).tuple();
 
     # Check if in map limits
     if self.owner.x == gamemap.xSize - 1:

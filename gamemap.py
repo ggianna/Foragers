@@ -14,13 +14,15 @@ class GameMap(object):
     def getInstanceOfFoe(self,  sClassName):
       return eval(sClassName +"(self.economy, self)");
     
-    def __init__(self,  economy, xSize=10,  ySize=10, trapProbability=0.05, treasureProbability=0.05,  foeProbability =0.10):
+    def __init__(self,  economy, xSize=10,  ySize=10, trapProbability=0.05, treasureProbability=0.05,  foeProbability =0.10,
+		 towerProbability = 0.01):
         self.economy = economy;
         self.xSize = xSize;
         self.ySize = ySize;
         self.trapProbability = trapProbability;
         self.treasureProbability = treasureProbability;
         self.foeProbability = foeProbability;
+        self.towerProbability = towerProbability;
         self.homePos = (0, 0);
     
         self.traps = [];
@@ -37,6 +39,8 @@ class GameMap(object):
         # Omit 0,0 because it is HOME
         for iCnt in range(1,  self.xSize): 
           for iCnt2 in range(1,  self.ySize):
+	    if iCnt == self.homePos[0] and iCnt2 == self.homePos[1]:
+	      continue # Do not put anything at home
             if (random.random() < self.trapProbability):
               curTrap = self.getInstanceOfTrap(random.choice(possibleTraps));
               curTrap.x = iCnt;
@@ -52,6 +56,8 @@ class GameMap(object):
         # Apply treasures
         for iCnt in range(0,  self.xSize): 
           for iCnt2 in range(0,  self.ySize):
+	    if iCnt == self.homePos[0] and iCnt2 == self.homePos[1]:
+	      continue # Do not put anything at home
             if (random.random() < self.treasureProbability):
               curTreasure = self.getInstanceOfTreasure(random.choice(possibleTreasures));
               curTreasure.x = iCnt;
@@ -59,8 +65,7 @@ class GameMap(object):
           
               self.treasures.append(curTreasure);
           
-    def applyFoes(self, possibleFoes = ["FireElementalistTower",  "Fort", "TowerClass", 
-        "IllusionistTower", "WaterElementalistTower", 
+    def applyFoes(self, possibleFoes = [ 
         "AssassinClass",  "BarbarianClass",
 #        "CartographerClass", 
       "DruidClass",  
@@ -72,10 +77,14 @@ class GameMap(object):
 #        "TechnicianClass", 
 #        "BridgeBuilderClass", 
       "WizardClass",  
-                  ]):
+                  ],
+      possibleTowers = ["FireElementalistTower",  "Fort", "TowerClass", 
+        "IllusionistTower", "WaterElementalistTower",]):
         # Apply foes
         for iCnt in range(0,  self.xSize): 
           for iCnt2 in range(0,  self.ySize):
+	    if iCnt == self.homePos[0] and iCnt2 == self.homePos[1]:
+	      continue # Do not put anything at home
             if (random.random() < self.foeProbability):
               curFoe = self.getInstanceOfFoe(random.choice(possibleFoes));
               curFoe .x = iCnt;
@@ -83,6 +92,18 @@ class GameMap(object):
           
               self.foes.append(curFoe);
           
+        # Apply foes
+        for iCnt in range(0,  self.xSize): 
+          for iCnt2 in range(0,  self.ySize):
+	    if iCnt == self.homePos[0] and iCnt2 == self.homePos[1]:
+	      continue # Do not put anything at home
+            if (random.random() < self.towerProbability):
+              curFoe = self.getInstanceOfFoe(random.choice(possibleTowers));
+              curFoe .x = iCnt;
+              curFoe .y = iCnt2;
+          
+              self.foes.append(curFoe);
+
     def getTraps(self, x, y):
       res = [];
       for curTrap in self.traps:
@@ -106,3 +127,4 @@ class GameMap(object):
           res.append(curFoe);
           
       return res;
+      
