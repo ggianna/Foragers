@@ -5,6 +5,7 @@ from runGame import Game
 from output import Output
 from spritesheet import Spritesheet
 from economy import Economy
+from soldiers import SoldierClass
 import gamemap
 import copy
  
@@ -12,7 +13,7 @@ class App(Game,  Output):
     # Output parameter has been removed (because the output is the app object itself
     def __init__(self,  economy,  gameMap,  army,  msgBaseDelaySecs = 0.10):
         # Init GAME parent
-        Game.__init__(self,  economy,  gameMap,  army,  output,  msgBaseDelaySecs)
+        Game.__init__(self,  economy,  gameMap,  army,  self,  msgBaseDelaySecs)
         self._running = True
         self.screen = None
         
@@ -46,10 +47,11 @@ class App(Game,  Output):
         
         # Default spritesheet assets
         self.sprites = Spritesheet("assets/fantasy-tileset-8cols-26rows-32x32pixels.png")
+        self.spritesPlural = Spritesheet("assets/fantasy-tileset-8cols-26rows-32x32pixels-shadow.png")
         self.enemySprites = Spritesheet("assets/fantasy-tileset-8cols-26rows-32x32pixels-red.png")
         
         output = self.output;
-        self.iGameTime = 0;
+        self.gameTime = 0;
         
         output.log("Game begins!");
             
@@ -79,33 +81,58 @@ class App(Game,  Output):
         
       # Main game loop
       output = self.output;
-      iGameTime = self.iGameTime;
+      iGameTime = self.gameTime;
 #      msgBaseDelaySecs = self.msgBaseDelaySecs;
       
       iGameTime += 1; # Next moment
       if (iGameTime % 100 == 0):
         output.log("The time is now %d..."%(iGameTime));
-      self.iGameTime = iGameTime;        
+      self.gameTime = iGameTime;        
       bEndConditions = False;
       
       # Local vars
       aAttackers = self.aAttackers;
+      aDefenders = self.gameMap.foes
       
       bActed = False;
       
+      # Check attackers
+      aToRemove = []
       for cCurAttacker in aAttackers:
-          if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
-            cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
-            # Reduce fullness
-            cCurAttacker.fullness -= 1;
-            bActed = True;
+	  if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
+	      output.log("\nAttacker" + str(id(cCurAttacker)) + " has died!");
+	      if cCurAttacker.fullness <= 0:
+		output.log("...in fact it was STARVATION...");
+	      # Put to dead
+	      self.dead += [(cCurAttacker, iGameTime)];
+	      aToRemove += [cCurAttacker];
+	      bActed = True;
+	  else:
+	    if self.timeToAct(cCurAttacker):
+	      # Reduce fullness
+	      cCurAttacker.fullness -= 1;
+	      bActed = cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
+      # Update attackers list
+      aAttackers = list(set(aAttackers) - set(aToRemove))
+      self.aAttackers = aAttackers
+      if (len(aToRemove) > 0):
+	output.log("Remaining attackers: " + ",".join(map(str,  aAttackers)))
+
+      # DEBUG LINES
+#              output.log("\n" + str(cCurAttacker) + "\n");
+#              output.log(pformat(vars(cCurAttacker)) + "\n");
       
-          if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
-              output.log("\nAttacker has died!");
-              # Put to dead
-              self.dead += [aAttackers[0]];
-              self.aAttackers = aAttackers[1:];
-              bActed = True;
+      
+      # Also check defenders
+      for cCurDefender in filter(lambda x: isinstance(x, SoldierClass), aDefenders):
+	  if (cCurDefender.currentHp <= 0):
+	    output.log("\nDefender" + str(id(cCurDefender)) + " has died!");
+	    self.gameMap.foes.remove(cCurDefender)
+	    bActed = True
+	  else:
+	    if self.timeToAct(cCurDefender):
+	      bActed = bActed or cCurDefender.act(aDefenders,  aAttackers,  self,  canMove = False,  canInteractWTraps = False,  canInteractWFoes = True,  
+		canInteractWTreasure = False,  canInteractWHome = False); # Cannot only interact with foes      
       
       if (bActed):
           self.repaintTerrain();
@@ -127,6 +154,8 @@ class App(Game,  Output):
         pygame.quit()
  
     def on_execute(self):
+	output = self
+	
         if self.on_init() == False:
             self._running = False
  
@@ -136,8 +165,8 @@ class App(Game,  Output):
             self.on_loop()
             self.on_render()
             
-        dScore = self.getScore(self.iGameTime,  self.aAttackers);
-        output.log("Score: %d after %d time"%(dScore,  self.iGameTime));
+        dScore = self.getScore(self.gameTime,  self.aAttackers, self.dead);
+        output.log("Score: %d after %d time"%(dScore,  self.gameTime));
         
         if (len(self.aAttackers) == 0):
             output.log("\n\nNo Attackers left! Defenders win!");
@@ -294,8 +323,14 @@ class App(Game,  Output):
       
       # Render soldiers
       for cItem in  attackers:
-          # Indicate attackers with starting A letter
-          mapInstance.squares[cItem.x][cItem.y] = "A" + str(cItem);
+          iAttCnt =  len(filter(lambda x: x == cItem.x and y == cItem.y, attackers))
+          if iAttCnt > 1:
+	    # Indicate attacker with starting a letter
+	    mapInstance.squares[cItem.x][cItem.y] = "a" + str(cItem);
+	  else:
+	    # Indicate multiple attackers with starting A letter
+	    mapInstance.squares[cItem.x][cItem.y] = "A" + str(cItem);
+	    
       for cItem in  defenders:
           mapInstance.squares[cItem.x][cItem.y] = str(cItem);
                 
@@ -306,12 +341,16 @@ class App(Game,  Output):
               sCurSq = mapInstance.squares[curCol][curRow]
               
               sprites = self.enemySprites
-              if sCurSq[0] == "A":
+              if sCurSq[0] == "a":
                 sprites = self.sprites
                 sCurSq = sCurSq[1:]
               else:
-                if isTerrain(sCurSq):
-                  sprites = self.sprites
+		if sCurSq[0] == "A":
+		  sprites = self.spritesPlural
+		  sCurSq = sCurSq[1:]
+		else:
+		  if isTerrain(sCurSq):
+		    sprites = self.sprites
 
                 
               img = None
@@ -337,6 +376,12 @@ class App(Game,  Output):
       
       # Actually render
       pygame.display.flip()
+
+def saveToFile(self, sFilename):
+    fOut = open(sFilename, 'w')
+    fOut.write(self.msg)
+    fOut.close()
+    
     
 if __name__ == "__main__" :
     # Init economy and map
@@ -363,3 +408,4 @@ if __name__ == "__main__" :
       ]);
     theApp = App(economy,  gameMap, army)
     theApp.on_execute()
+    print "Score: " + str(theApp.finalScore)

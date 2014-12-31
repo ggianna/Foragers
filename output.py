@@ -13,6 +13,9 @@ class Output(object):
   def color(self,  sColor = None): pass
   def drawMap(self,  mapToDraw,  attackers,  defenders,  trapColor = "red", 
     treasureColor = "yellow", terrainColor = "green"): pass
+  def saveToFile(self, sFilename):
+    pass
+
     
 class ConsoleOutput(Output):
   def __init__(self):
@@ -57,11 +60,6 @@ class ConsoleOutput(Output):
     #self.msg = "";
     self.lastMessages = [];
     
-  def saveToFile(self, sFilename):
-    fOut = open(sFilename, 'w')
-    fOut.write(self.msg)
-    fOut.close()
-
   def color(self, sColor = None):
     self.nextColor = sColor;
     
@@ -98,6 +96,7 @@ class ConsoleOutput(Output):
       # Render soldiers
       for cItem in  attackers:
           mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  cItem.color);
+          
       for cItem in  defenders:
           mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  cItem.color);
                 
@@ -110,6 +109,11 @@ class ConsoleOutput(Output):
 
       # Get rid of deep map copy
       del mapInstance;
+
+  def saveToFile(self, sFilename):
+    fOut = open(sFilename, 'w')
+    fOut.write(self.msg)
+    fOut.close()
 
 if __name__ == "__main__":
     o = Output();

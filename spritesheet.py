@@ -12,7 +12,7 @@ class Spritesheet(object):
     
     def __init__(self, filename,  tile_width = 32,  tile_height = 32):
         try:
-            self.sheet = pygame.image.load(filename).convert()
+            self.sheet = pygame.image.load(filename).convert_alpha()
             self.tile_width = tile_width
             self.tile_height = tile_height
             self._cache = {};
@@ -34,13 +34,20 @@ class Spritesheet(object):
     def image_at(self, rectangle, colorkey = None):
         "Loads image from x,y,x+offset,y+offset"
         rect = pygame.Rect(rectangle)
-        image = pygame.Surface(rect.size).convert()
+        image = pygame.Surface(rect.size).convert().convert_alpha()
+        # Fill with bg
+        image.fill((0,128,0))
+        # Add image
         image.blit(self.sheet, (0, 0), rect)
-        if colorkey is not None:
-            if colorkey is -1:
-                colorkey = image.get_at((0,0))
-            image.set_colorkey(colorkey, pygame.RLEACCEL)
+        
+        # TODO: Check
+        #if colorkey is not None:
+            #if colorkey is -1:
+                #colorkey = image.get_at((0,0))
+            #image.set_colorkey(colorkey, pygame.RLEACCEL)
+        #return image
         return image
+        
     # Load a whole bunch of images and return them as a list
     def images_at(self, rects, colorkey = None):
         "Loads multiple images, supply a list of coordinates" 

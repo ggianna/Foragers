@@ -140,8 +140,11 @@ class Game(object):
   def act(self, actor, target,  friends, foes,  traps = []):
       output = self.output;
       
-      if (actor is SoldierClass):
-        output.color(actor.color);
+      if (isinstance(actor,  SoldierClass)):
+        try:
+          output.color(actor.color);
+        except:
+          pass
       
       # Use abilities, if they exist
       if len(actor.abilities) > 0:
@@ -262,22 +265,28 @@ class Game(object):
         bActed = False;
         
         # Check attackers
+        aToRemove = []
         for cCurAttacker in aAttackers:
             if (cCurAttacker.currentHp <= 0 or cCurAttacker.fullness <= 0):
                 output.log(colored("\nAttacker", cCurAttacker.color) + str(id(cCurAttacker)) + " has died!");
                 if cCurAttacker.fullness <= 0:
-		  output.log("...in fact it was STARVATION...");
+                  output.log("...in fact it was STARVATION...");
                 # Put to dead
-                self.dead += [(aAttackers[0], iGameTime)];
-                self.aAttackers = aAttackers[1:];
+                self.dead += [(cCurAttacker, iGameTime)];
+                aToRemove += [cCurAttacker];
                 bActed = True;
             else:
-	      if (iGameTime % round(1000.0 / cCurAttacker.attackSpeed)) == 0:
-		# Reduce fullness
-		cCurAttacker.fullness -= 1;
-		bActed = cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
-              
-              # DEBUG LINES
+              if self.timeToAct(cCurAttacker):
+                # Reduce fullness
+                cCurAttacker.fullness -= 1;
+                bActed = cCurAttacker.act(aAttackers,  self.gameMap.foes,  self);
+        # Update attackers list
+        aAttackers = list(set(aAttackers) - set(aToRemove))
+        self.aAttackers = aAttackers
+        if (len(aToRemove) > 0):
+          output.log("Remaining attackers: " + ",".join(map(str,  aAttackers)))
+
+        # DEBUG LINES
 #              output.log("\n" + str(cCurAttacker) + "\n");
 #              output.log(pformat(vars(cCurAttacker)) + "\n");
         
@@ -285,12 +294,13 @@ class Game(object):
         # Also check defenders
         for cCurDefender in filter(lambda x: isinstance(x, SoldierClass), aDefenders):
             if (cCurDefender.currentHp <= 0):
-	      output.log("\nDefender" + str(id(cCurDefender)) + " has died!");
-	      self.gameMap.foes.remove(cCurDefender)
-	      bActed = True
-	    else:
-	      if (iGameTime % round(1000.0 / cCurDefender.attackSpeed)) == 0:
-		bActed = bActed or cCurDefender.act(aDefenders,  aAttackers,  self, False); # Cannot move around
+              output.log("\nDefender" + str(id(cCurDefender)) + " has died!");
+              self.gameMap.foes.remove(cCurDefender)
+              bActed = True
+            else:
+              if self.timeToAct(cCurDefender):
+                bActed = bActed or cCurDefender.act(aDefenders,  aAttackers,  self,  canMove = False,  canInteractWTraps = False,  canInteractWFoes = True,  
+                  canInteractWTreasure = False,  canInteractWHome = False); # Cannot only interact with foes
         
         if (bActed):
             self.repaintTerrain();
@@ -304,7 +314,7 @@ class Game(object):
                     iRowCnt = 0;
                 
         # TODO: Remove
-        bEndConditions = (len(self.aAttackers) == 0) or (iGameTime > 1000);
+        bEndConditions = (len(self.aAttackers) == 0) or (iGameTime >= 1000);
         # End of game
         if (bEndConditions):
             break;
@@ -323,13 +333,17 @@ class Game(object):
     output.dump();
     return dScore;
 
+  def timeToAct(self,  actor):
+    return (self.gameTime % math.floor(1000.0 / actor.attackSpeed)) == 0
+    
+    
   def getScore(self,  iGameTime,  aSurvivors, aDead):
     dScore = iGameTime;
     for curSurvivor in aSurvivors:
       dScore += self.economy.cost(curSurvivor) + curSurvivor.score;
     # Also take into account dead
     for soldier,dieTime in self.dead:
-      dScore += soldier.score * float(dieTime) / float(iGameTime)
+      dScore += (soldier.score / 2) * float(dieTime) / float(iGameTime)
     return dScore;
 
 if __name__ == "__main__":

@@ -36,7 +36,7 @@ class UnitStrategyClass(object):
   # Returns the offset for the unit movement
   def decideMove(self, friends, foes, gamemap):
     # Update current space as visited
-    self.visited += (self.owner.x,self.owner.y)
+    self.visited += [(self.owner.x,self.owner.y)]
     # Init direction scores
     directionScores = {(-1,-1): 0.0, (0, -1): 0.0, (1, -1): 0.0,
                (-1, 0): 0.0, (0, 0) : 0.0, (1, 0) : 0.0,
@@ -63,32 +63,30 @@ class UnitStrategyClass(object):
           sCurClassName = "SoldierClass";     
         if (isinstance(curFoe, towers.TowerClass)):
           sCurClassName = "TowerClass";
-	
-	foeDirection = self.directionForPosition(curFoe).tuple()
-	if (foeDirection == (0,0)):
-	  bInBattle = True
+
+        foeDirection = self.directionForPosition(curFoe).tuple()
         directionScores[foeDirection] += self.riskiness[sCurClassName] / len(lFoes);
-    
+        if (foeDirection == (0,0)):
+          bInBattle = True
+      
     lTrapsInSight = self.trapsInSight(friends, foes, gamemap);
-    # DEBUG LINES
-#    print("\nFound %d traps in range.\n"%(len(lTrapsInSight)));    
-    
     if len(lTrapsInSight) > 0:
+      # DEBUG LINES
+      #    print("\nFound %d traps in range.\n"%(len(lTrapsInSight)));    
       for curTrap in lTrapsInSight:
         directionScores[self.directionForPosition(curTrap).tuple()] += (self.riskiness["TrapClass"]) / len(lTrapsInSight);
     
-    lTreasureInSight = self.treasureInSight(friends, foes, gamemap);
-    # DEBUG LINES
-#    print("\nFound %d treasures in range.\n"%(len(lTreasureInSight)));    
-    
+    lTreasureInSight = self.treasureInSight(friends, foes, gamemap);    
     if len(lTreasureInSight) > 0:
+      # DEBUG LINES
+      #    print("\nFound %d treasures in range.\n"%(len(lTreasureInSight)));    
       for curTreasure in lTreasureInSight: 
         # If not enough treasured gathered
         if (self.economy.cost(self.owner) * 1.5 - self.owner.treasure > 0):
           directionScores[self.directionForPosition(curTreasure).tuple()] += self.greed / len(lTreasureInSight);
     
     # Do we miss home because of hunger?
-    if self.owner.fullness <= self.distanceFromHome():
+    if self.owner.fullness <= 0.5 * self.distanceFromHome():
       directionScores[self.directionForPosition(self.homePos).tuple()] += self.fasting;
       
     # Are we against going back to our last position?
@@ -105,9 +103,9 @@ class UnitStrategyClass(object):
     # Are we curious to visit new places?
     if (random.random() <= self.curiosity):
       for xInc in range(-1,2):
-	for yInc in range(-1,2):
-	  if (self.owner.x + xInc, self.owner.y + yInc) not in self.visited:
-	    directionScores[xInc, yInc] += 1.0
+        for yInc in range(-1,2):
+          if (self.owner.x + xInc, self.owner.y + yInc) not in self.visited:
+            directionScores[xInc, yInc] += 1.0
       
  
     # DEBUG LINES
@@ -123,7 +121,7 @@ class UnitStrategyClass(object):
       if val < 0.0:
         directionScores[key] = 0.0;
     if bInBattle:
-      directionScores[0,0] += 1.0; # Increased importance if in bInBattle
+      directionScores[0,0] += 5.0; # Increased importance if in bInBattle
       
     # Follow probability
     curDirection = None;

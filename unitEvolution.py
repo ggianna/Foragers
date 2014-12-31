@@ -12,6 +12,8 @@ from output import Output, ConsoleOutput;
 from multiprocessing import Pool
 import numpy
 
+from foragers import App
+
 class ProbGene(FloatGene):
     """
     Gene which represents the numbers used in our organism
@@ -21,10 +23,10 @@ class ProbGene(FloatGene):
     randMax = 1.00
     
     # probability of mutation
-    mutProb = 0.05
+    mutProb = 0.10
     
     # degree of mutation
-    mutAmt = 0.25
+    mutAmt = 0.10
     
 def runGame(g):
   return g.run()
@@ -42,25 +44,25 @@ class SoldierOrganism(Organism):
 
     def __init__(self, **kw):
       try:
-	#print "Loading soldier class"
-	SoldierOrganism.soldierClass = kw.get("soldierClass")
-	del kw["soldierClass"]
-	#print "Done"
+        #print "Loading soldier class"
+        SoldierOrganism.soldierClass = kw.get("soldierClass")
+        del kw["soldierClass"]
+        #print "Done"
       except:
-	print "Reverting to default class since no class was given for soldier organism."
-	SoldierOrganism.soldierClass = "SoldierClass"
+        print "Reverting to default class since no class was given for soldier organism."
+        SoldierOrganism.soldierClass = "SoldierClass"
       super(SoldierOrganism, self).__init__(**self.genome)
 
     
     def getGameMap(self, bReset = False):
       if self.gameMap is None or bReset:
-	economy = self.getEconomy();
+        economy = self.getEconomy();
 	self.gameMap = gamemap.GameMap(economy, 10, 10);
       return self.gameMap
     
     def getEconomy(self, bReset = False):
       if self.economy is None or bReset:
-	self.economy = Economy(5000);
+        self.economy = Economy(5000);
       return self.economy
 
     
@@ -91,26 +93,26 @@ class SoldierOrganism(Organism):
         self.results = []
         
         for iGameCnt in range(self.NUMBER_OF_GAMES):
-	  # Init messaging
-	  output = Output();
-	  # Init  army
-	  # Set colors
-	  sAttackerColor = "white";
-	  # Init economy and map
-	  economy = self.getEconomy(False);
-	  gameMap = self.getGameMap(True);
-	  # Get army
-	  army = [self.getSoldier(economy,  gameMap) for x in range(self.NUMBER_OF_SOLDIERS)];
-	  army += [self.getHelper(economy,  gameMap) for x in range(self.NUMBER_OF_HELPERS)];
-	    
-	  for curSoldier in army: curSoldier.color = sAttackerColor;
-	  # Init game
-	  g = Game(economy,  gameMap,  army,  output,  0.0);	  
-	  self.results.append(pool.apply_async(runGame, [g]))
-	  
-	  # DEBUG LINES
-	  #print len(self.results)
-    	
+          # Init messaging
+          output = Output();
+          # Init  army
+          # Set colors
+          sAttackerColor = "white";
+          # Init economy and map
+          economy = self.getEconomy(False);
+          gameMap = self.getGameMap(True);
+          # Get army
+          army = [self.getSoldier(economy,  gameMap) for x in range(self.NUMBER_OF_SOLDIERS)];
+          army += [self.getHelper(economy,  gameMap) for x in range(self.NUMBER_OF_HELPERS)];
+            
+          for curSoldier in army: curSoldier.color = sAttackerColor;
+          # Init game
+          g = Game(economy,  gameMap,  army,  output,  0.0);    
+          self.results.append(pool.apply_async(runGame, [g]))
+    
+    # DEBUG LINES
+    #print len(self.results)
+      
     def fitness(self):
         """
         Implements the 'fitness function' for this species.
@@ -124,26 +126,26 @@ class SoldierOrganism(Organism):
           
         scores = [];
         for curRes in self.results:
-	  scores += [float(curRes.get())]
-	  # DEBUG LINES
-	  #print curRes.get()
+          scores += [float(curRes.get())]
+        # DEBUG LINES
+        #print curRes.get()
         # DEBUG LINES
         #raw_input()
         
         # Save avg score
         self.avgScore = numpy.percentile(scores, 0.33);
-	  
-	# Init economy and map
-	economy = self.getEconomy(False);
-	gameMap = self.getGameMap(True);
-	basePrice = self.NUMBER_OF_SOLDIERS * self.getEconomy(False).cost(self.getSoldier(economy,  gameMap));
-	# Calc evaluation (lower is better)
-	self.cachedFitness = (1000.0 + 5.0 * basePrice) / (self.avgScore + 1.0)
+    
+        # Init economy and map
+        economy = self.getEconomy(False);
+        gameMap = self.getGameMap(True);
+        basePrice = self.NUMBER_OF_SOLDIERS * self.getEconomy(False).cost(self.getSoldier(economy,  gameMap));
+        # Calc evaluation (lower is better)
+        self.cachedFitness = (1000.0 + 5.0 * basePrice) / (self.avgScore + 1.0)
         return self.cachedFitness;
 
     def __repr__(self):
         sPhenotype = ";".join([x + ":" + ("%5.3f"%(self[x])) for x in self.genome.keys()]);
-        return "<fitness=%4.2f (or score %4.2f)> %s" % (
+        return "%s <fitness=%4.2f (or score %4.2f)> %s" % (self.soldierClass,
             self.fitness(),  self.avgScore, 
             sPhenotype
             )
@@ -175,12 +177,16 @@ class SoldierPopulation(Population):
 def main():
     # Init calculator pool
     global pool
-    pool = Pool(processes=6)
+    pool = Pool(processes=4)
+    sSoldierClass = 'BarbarianClass'
+    
+    print "Starting run for " + sSoldierClass
+
     # Create custom organism
     class cLocalOrganism(SoldierOrganism):
       def __init__(self, **kw):
-	super(cLocalOrganism, self).__init__(soldierClass='BarbarianClass', **kw)
-	
+        super(cLocalOrganism, self).__init__(soldierClass='BarbarianClass', **kw)
+      
     pop = SoldierPopulation((),species=cLocalOrganism)
     #pop.setSpecies('localOrganism')
     
@@ -193,7 +199,7 @@ def main():
     try:
         generations = 0
         while True:
-	  
+    
             # execute a generation
             pop.gen()
             generations += 1
@@ -202,8 +208,8 @@ def main():
             #print [("%.2f %.2f" % (o['x1'], o['x2'])) for o in pop.organisms]
             best = pop.organisms[0]
             print("fitness=%4.2f %s" % (best.get_fitness(), str(best)))
-	    print "Generation running time %d secs"%(time.time() - lastTime)
-	    lastTime = time.time()
+            print "Generation running time %d secs"%(time.time() - lastTime)
+            lastTime = time.time()
             if best.get_fitness() < 0.10 or generations >= maxGens:
                 break
 
@@ -225,11 +231,16 @@ def main():
     army += [best.getHelper(economy,  gameMap) for x in range(best.NUMBER_OF_HELPERS)];
       
     # Set colors
-    sAttackerColor = "white";
+    sAttackerColor = (255, 255, 255);
     for curSoldier in army: curSoldier.color = sAttackerColor;
     # Init game
-    g = Game(economy,  gameMap,  army,  output,  0.1);	  
-    resScore = runGame(g)
+    #g = Game(economy,  gameMap,  army,  output,  0.1);    
+    output = Output() # Redirect to NULL output
+    theApp = App(economy,  gameMap, army, output)
+    theApp.on_execute()
+    
+    resScore = theApp.finalScore
+    
     print "Final score:" + str(resScore)
     print "Expected:" + str(best)
     output.saveToFile("logBest.txt")

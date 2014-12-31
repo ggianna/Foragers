@@ -2,7 +2,7 @@ from abilities import *;
 from unitStrategy import *;
 
 class SoldierClass(object):
-    fullness = 40;
+    fullness = 30;
 
     def __init__(self,  economy = None,  gameMap  = None):
         self.x = 0;
@@ -22,9 +22,9 @@ class SoldierClass(object):
         
         # TODO: Check what to do with gameMap
         if gameMap is not None:
-	  self.strategy = UnitStrategyClass(economy,  self,  gameMap.homePos);
-	else:
-	  self.strategy = UnitStrategyClass(economy,  self,  (0,0));
+          self.strategy = UnitStrategyClass(economy,  self,  gameMap.homePos);
+        else:
+          self.strategy = UnitStrategyClass(economy,  self,  (0,0));
         
         self.currentHp = self.hp;
         self.currentMp = self.mp;
@@ -54,7 +54,8 @@ class SoldierClass(object):
         
         return res;
 
-    def act(self,  friends,  foes,  game, canMove = True):
+    def act(self,  friends,  foes,  game, canMove = True,  canInteractWTraps = True,  canInteractWFoes = True,  canInteractWTreasure = True, 
+      canInteractWHome = True):
         bActed = False
         
         lTraps = self.gameMap.getTraps(self.x,  self.y);
@@ -64,49 +65,55 @@ class SoldierClass(object):
         
         # Decide move
         if canMove:
-	  mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
-	  bActed = True
-	else:
-	  mMove = (0,0)
+          mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
+          bActed = True
+        else:
+          mMove = (0,0)
         # DEBUG LINES
 #        game.output.log("Moving:" + str(mMove));
         ##########
         self.move(mMove);
+
+        # Refresh local info
+        lTraps = self.gameMap.getTraps(self.x,  self.y);
+        lTreasures = self.gameMap.getTreasures(self.x,  self.y);
+        lFoes = self.foesToAttack(friends,  foes);
+        lFriends = self.friendsNear(friends,  foes);
         
-        if len(lTraps) > 0:
+
+        if canInteractWTraps and len(lTraps) > 0:
             for curTrap in lTraps:
                 # DEBUG LINES
 #                game.output.log("\n\n!!! Interacted with trap %s."%(str((curTrap.x,  curTrap.y))));
                 ##########
-                
                 if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes,  [curTrap]):
-		  bActed = True
+                  bActed = True
                   return bActed;
                 
-        if len(lFoes) > 0:
+        if canInteractWFoes and len(lFoes) > 0:
             for curFoe in lFoes:
                 # DEBUG LINES
 #                game.output.log("\nBattled foe!");
                 ##########
                 if not game.interactWithFoe(self,  curFoe,  lFriends,  lFoes):
-		  bActed = True
+                  bActed = True
                   return bActed;
                 
-        if len(lTreasures) > 0:
+        if canInteractWTreasure and len(lTreasures) > 0:
             for curTreasure in lTreasures:
                 # DEBUG LINES
 #                game.output.log("\nGot treasure %s!!!"%(str((curTreasure.x,  curTreasure.y))));
                 ##########
                 if not game.interactWithTreasure(self,  curTreasure,  lFriends,  lFoes):
-		  bActed = True
+                  bActed = True
                   return bActed;
 
-        if self.x == self.gameMap.homePos[0] and self.y == self.gameMap.homePos[1]:
-	    if not game.interactWithHome(self):
-		  bActed = True
-                  return bActed;
+        if canInteractWHome and self.x == self.gameMap.homePos[0] and self.y == self.gameMap.homePos[1]:
+          if not game.interactWithHome(self):
+            bActed = True
+            return bActed;
 
-	return bActed
+        return bActed
     
     def move(self, moveTuple):
         self.move3D(moveTuple[0], moveTuple[1], 0);
