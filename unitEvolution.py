@@ -11,6 +11,7 @@ from output import Output, ConsoleOutput;
 
 from multiprocessing import Pool
 import numpy
+import time
 
 from foragers import App
 
@@ -80,6 +81,21 @@ class SoldierOrganism(Organism):
       s.repetition = self['repetition'];
       
       return s;
+  
+    # TODO: To use???
+    def loadFromSoldier(self, sSoldier):
+      self['riskinessSoldierClass'] = sSoldier.riskiness["SoldierClass"]
+      self['riskinessTrapClass'] = sSoldier.riskiness["TrapClass"]
+      self['riskinessTowerClass'] = sSoldier.riskiness["TowerClass"];
+      self['curiosity'] = sSoldier.curiosity
+      self['groupSpirit'] = sSoldier.groupSpirit
+      self['fasting'] = sSoldier.fasting
+      self['greed'] = sSoldier.greed
+      self['spontaneity'] = sSoldier.spontaneity
+      self['repetition'] = sSoldier.repetition
+      
+      return self;
+
       
     def getHelper(self,  economy,  gameMap):
       s = SoldierClass(economy,  gameMap);
@@ -172,12 +188,63 @@ class SoldierPopulation(Population):
 
     # number of random new orgs to add each generation, default 0 
     numNewOrganisms = 10
-    
+
+
+def runEvolutionFor(sSoldier):
+  # Globals
+  global pool
+  pool = Pool(processes=4)
+  sSoldierType = type(sSoldier).__name__
+  sSoldier
+  
+  # Create custom organism
+  class cLocalOrganism(SoldierOrganism):
+    def __init__(self, **kw):
+      super(cLocalOrganism, self).__init__(soldierClass=sSoldierType, **kw);
+      
+  pop = SoldierPopulation((),species=cLocalOrganism)
+  #pop.setSpecies('localOrganism')
+  
+  # create a new population, with randomly created members        
+  maxGens = 10;
+
+  import time
+  lastTime = time.time()
+  
+  try:
+      generations = 0
+      while True:
+  
+	  # execute a generation
+	  pop.gen()
+	  generations += 1
+
+	  # and dump it out
+	  #print [("%.2f %.2f" % (o['x1'], o['x2'])) for o in pop.organisms]
+	  best = pop.organisms[0]
+	  # DEBUG LINES
+	  print("Fitness %4.2f (%s)" % (best.get_fitness(), str(best)))
+	  print "Generation running time %d secs"%(time.time() - lastTime)
+	  lastTime = time.time()
+	  if best.get_fitness() < 0.10 or generations >= maxGens:
+	      break
+
+
+  except KeyboardInterrupt:
+      pass
+  print("Executed", generations, "generations")
+  print("on species ", str(pop.species.soldierClass))
+  print("best soldier ", str(best.getSoldier(None, None)))
+  print("with genome ",str(best))
+
+
 # now a func to run the population
 def main():
-    # Init calculator pool
+    # Globals
     global pool
     pool = Pool(processes=4)
+    
+    # Init calculator pool
     sSoldierClass = 'BarbarianClass'
     
     print "Starting run for " + sSoldierClass
@@ -193,7 +260,6 @@ def main():
     # create a new population, with randomly created members        
     maxGens = 10;
 
-    import time
     lastTime = time.time()
     
     try:

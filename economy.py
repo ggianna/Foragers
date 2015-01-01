@@ -1,9 +1,10 @@
 class Economy(object):
-    def __init__(self,  maxMoney = 1000.0):
-        self.maxMoney = maxMoney;
+    def __init__(self,  startMoney = 1000.0):
+        self.startMoney = startMoney
+        self.baseCost = startMoney / 10
         
     def cost(self,  unit):
-        iBaseCost = 100;
+        iBaseCost = self.baseCost
         
         iBaseCost += (unit.hp * unit.defence) * (1.0 + \
         (len(unit.resistances) / 4.0) - (len(unit.vulnerabilities) / 4.0)) * \
@@ -25,3 +26,8 @@ class Economy(object):
         
         return iBaseCost;
 
+    def buildingCost(self, building):
+      return self.baseCost * building.mapSize * (1.0 + sum(map(lambda x: building.improvement[x], building.improvement))) 
+    
+    def trainCost(self):
+      return iBaseCost / 5.0

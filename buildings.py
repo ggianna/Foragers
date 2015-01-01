@@ -12,6 +12,8 @@ class Barracks(object):
     
     # For each army soldier
     for sCur in army:
+      pass
+      # TODO: implement
       # Improve army through real game
       # If roll is low enough
 	# apply improvemnts

@@ -2,7 +2,7 @@ from buildings import *
 
 class Player(Object):
   
-  def __init__(self, name, money, army = [SoldierClass, SoldierClass, SoldierClass], buildings = [Barracks]):
+  def __init__(self, name, money, army = 10 * [SoldierClass], buildings = [Barracks]):
     self.name = name
     self.money = money
     self.army = army
@@ -17,7 +17,7 @@ class Player(Object):
       return False;
     
   def buyBuilding(self, economy, building):
-    if economy.cost(building) <= self.money:
+    if economy.buildingCost(building) <= self.money:
       self.buildings += [building]
       self.money -= economy.cost(building)
       return True;

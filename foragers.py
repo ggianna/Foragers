@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import pygame
 from pygame.locals import *
-from runGame import Game
+from game import Game
 from output import Output
 from spritesheet import Spritesheet
 from economy import Economy
