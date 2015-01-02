@@ -6,9 +6,9 @@ class UI(object):
   def __printMenu(self,dOptionToFunction):
     dKeyToOption = dict()
     iCnt = 0
-    for sCurOption in dOptionToFunction.keys():
-      dKeyToOption[str(iCnt)] = sCurOption
-      print "%d for %s"%(iCnt, sCurOption)
+    for sCurOption in dOptionToFunction:
+      dKeyToOption[str(iCnt)] = sCurOption[1]
+      print "%d for %s"%(iCnt, sCurOption[0])
       iCnt+=1
     return dKeyToOption
       
@@ -21,20 +21,20 @@ class UI(object):
     dKeyToOption = self.__printMenu(dOptionToFunction)
     
     sResp = raw_input()
-    while not (sResp in dKeyToOption.keys()):
+    while not (sResp in dKeyToOption):
       print "\nWARNING: INVALID OPTION\nPlease select a valid option (From zero to %d)."%(len(dKeyToOption) - 1)
       dKeyToOption = self.__printMenu(dOptionToFunction)
       sResp = raw_input()
 
-    try:
-      return dOptionToFunction[dKeyToOption[sResp]]()
-    except:
-      return dOptionToFunction[dKeyToOption[sResp]]
-    
+    if type(dKeyToOption[sResp]).__name__ == "str":
+      return dKeyToOption[sResp]
+    else:
+      sRes = dKeyToOption[sResp]()
+      return sRes
   
 if __name__ == "__main__":
   import sys
   ui = UI()
-  ui.menu({"Test1" : lambda : sys.stdout.write("1 run!\n"),
-	   "Test2" : lambda : sys.stdout.write("2 run!\n"),
-	   "Exit": lambda: None})
+  ui.menu([("Test1", lambda : sys.stdout.write("1 run!\n")),
+	   ("Test2" , lambda : sys.stdout.write("2 run!\n")),
+	   ("Exit", lambda: None)])

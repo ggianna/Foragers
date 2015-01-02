@@ -138,7 +138,7 @@ class SoldierClass(object):
 
         
 class KnightClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.hp *= 1.25; # 10 percent more hitpoints
@@ -159,7 +159,7 @@ class KnightClass(SoldierClass):
         return "/K\\";
 
 class BarbarianClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.hp *= 1.25; # 10 percent more hitpoints
@@ -183,7 +183,7 @@ class BarbarianClass(SoldierClass):
 
         
 class MageClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.50;
@@ -204,7 +204,7 @@ class MageClass(SoldierClass):
         return "/M\\";
 
 class DruidClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.50;
@@ -225,7 +225,7 @@ class DruidClass(SoldierClass):
         return "/D\\";
 
 class WizardClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.80;
@@ -247,7 +247,7 @@ class WizardClass(SoldierClass):
         return "/W\\";
 
 class RangerClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 1.20;
@@ -268,7 +268,7 @@ class RangerClass(SoldierClass):
         return "/R\\";
 
 class AssassinClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.90;
@@ -289,7 +289,7 @@ class AssassinClass(SoldierClass):
         return "/X\\";
 
 class EnchanterClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.50;
@@ -310,7 +310,7 @@ class EnchanterClass(SoldierClass):
         return "/E\\";
 
 class TechnicianClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.50;
@@ -331,7 +331,7 @@ class TechnicianClass(SoldierClass):
         return "/t\\";
 
 class CartographerClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.50;
@@ -352,7 +352,7 @@ class CartographerClass(SoldierClass):
         return "/c\\";
 
 class BridgeBuilderClass(SoldierClass):
-    def __init__(self,  economy,  gameMap):
+    def __init__(self, economy = None,  gameMap  = None):
         SoldierClass.__init__(self, economy, gameMap);
         
         self.attack *= 0.60;

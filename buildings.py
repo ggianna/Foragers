@@ -1,11 +1,14 @@
 class Barracks(object):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.0, "soldiers":0.01, "towers":0.0};
+    self.trainingGround = {"traps":0.0, "soldiers":0.01, "towers":0.0, "treasure":0.10};
     self.mapSize = 10
     self.improvement = {"hp": 0.05, "attackSpeed": 0.05, "attack" : 0.05, "defence" : 0.05}
     self.newAbilities = []
     
+  def __repr__(self):
+    return "%s with a capacity of %d. \nThe training ground probabilities are as follows: %s.\nThe probability of unit improvement is the following: %s.\nThe new abilities one can gain are %s."%(
+      type(self).__name__, self.capacity, str(self.trainingGround), str(self.improvement), str(self.newAbilities))
   def train(self, army):
     # Keep first [capacity] soldiers to train
     armyToTrain = army[0:self.capacity]
@@ -23,21 +26,21 @@ class Barracks(object):
 class GladiatorPit(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.05, "soldiers":0.20, "towers":0.0};
+    self.trainingGround = {"traps":0.05, "soldiers":0.20, "towers":0.0, "treasure":0.10};
     self.mapSize = 12
     self.improvement = {"hp": 0.15, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.05}
 
 class GladiatorSchool(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.05, "soldiers":0.20, "towers":0.0};
+    self.trainingGround = {"traps":0.05, "soldiers":0.20, "towers":0.0, "treasure":0.10};
     self.mapSize = 12
     self.improvement = {"hp": 0.20, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.05}
 
 class GladiatorFort(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.05, "soldiers":0.20, "towers":0.0};
+    self.trainingGround = {"traps":0.05, "soldiers":0.20, "towers":0.0, "treasure":0.10};
     self.mapSize = 15
     self.improvement = {"hp": 0.25, "attackSpeed": 0.15, "attack" : 0.15, "defence" : 0.10,
 			"abilities" : 0.10}
@@ -47,14 +50,14 @@ class GladiatorFort(Barracks):
 class TrainingPit(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0, "treasure":0.10};
     self.mapSize = 12
     self.improvement = {"hp": 0.10, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.10}
     
 class TrainingGround(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0, "treasure":0.10};
     self.mapSize = 12
     self.improvement = {"hp": 0.10, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.10, 
 			"abilities" : 0.10}
@@ -63,7 +66,7 @@ class TrainingGround(Barracks):
 class TrainingFields(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0, "treasure":0.10};
     self.mapSize = 15
     self.improvement = {"hp": 0.15, "attackSpeed": 0.15, "attack" : 0.15, "defence" : 0.15, 
 			"abilities" : 0.15}
@@ -72,7 +75,7 @@ class TrainingFields(Barracks):
 class TechnicalLab(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0, "treasure":0.10};
     self.mapSize = 10
     self.improvement = {"hp": 0.05, "attackSpeed": 0.05, "attack" : 0.05, "defence" : 0.10, 
 			"abilities" : 0.15}
@@ -81,7 +84,7 @@ class TechnicalLab(Barracks):
 class TechnicalClass(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0, "treasure":0.10};
     self.mapSize = 12
     self.improvement = {"hp": 0.05, "attackSpeed": 0.05, "attack" : 0.05, "defence" : 0.10, 
 			"abilities" : 0.20}
@@ -90,7 +93,7 @@ class TechnicalClass(Barracks):
 class TechnicalSchool(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.0, "treasure":0.10};
     self.mapSize = 15
     self.improvement = {"hp": 0.10, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.10, 
 			"abilities" : 0.25}
@@ -99,7 +102,7 @@ class TechnicalSchool(Barracks):
 class StrategyTent(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.10};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.10, "treasure":0.10};
     self.mapSize = 10  
     self.improvement = {"hp": 0.05, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.10, 
 			"abilities" : 0.15}
@@ -108,7 +111,7 @@ class StrategyTent(Barracks):
 class StrategyClass(Barracks):
   def __init__(self):
     self.capacity = 12
-    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.10};
+    self.trainingGround = {"traps":0.10, "soldiers":0.10, "towers":0.10, "treasure":0.10};
     self.mapSize = 12  
     self.improvement = {"hp": 0.05, "attackSpeed": 0.10, "attack" : 0.10, "defence" : 0.10, 
 			"abilities" : 0.20}
@@ -127,7 +130,7 @@ class StrategySchool(Barracks):
 class ArcheryTarget(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.00, "soldiers":0.10, "towers":0.10};
+    self.trainingGround = {"traps":0.00, "soldiers":0.10, "towers":0.10, "treasure":0.10};
     self.mapSize = 10
     self.improvement = {"hp": 0.05, "attackSpeed": 0.15, "attack" : 0.15, "defence" : 0.05,
 			"abilities" : 0.15}
@@ -136,7 +139,7 @@ class ArcheryTarget(Barracks):
 class ArcheryRange(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.00, "soldiers":0.10, "towers":0.10};
+    self.trainingGround = {"traps":0.00, "soldiers":0.10, "towers":0.10, "treasure":0.10};
     self.mapSize = 10
     self.improvement = {"hp": 0.05, "attackSpeed": 0.15, "attack" : 0.15, "defence" : 0.05,
 			"abilities" : 0.15}
@@ -145,7 +148,7 @@ class ArcheryRange(Barracks):
 class ArcherySchool(Barracks):
   def __init__(self):
     self.capacity = 6
-    self.trainingGround = {"traps":0.00, "soldiers":0.10, "towers":0.10};
+    self.trainingGround = {"traps":0.00, "soldiers":0.10, "towers":0.10, "treasure":0.10};
     self.mapSize = 10
     self.improvement = {"hp": 0.05, "attackSpeed": 0.15, "attack" : 0.15, "defence" : 0.05}
     self.improvement = {"hp": 0.05, "attackSpeed": 0.15, "attack" : 0.15, "defence" : 0.05,

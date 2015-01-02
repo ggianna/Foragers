@@ -27,7 +27,7 @@ class Economy(object):
         return iBaseCost;
 
     def buildingCost(self, building):
-      return self.baseCost * building.mapSize * (1.0 + sum(map(lambda x: building.improvement[x], building.improvement))) 
+      return self.baseCost * building.mapSize * (1.0 + sum(map(lambda x: building.improvement[x], building.improvement))) / 5.0
     
     def trainCost(self):
       return iBaseCost / 5.0
