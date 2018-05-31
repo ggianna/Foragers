@@ -3,7 +3,7 @@ import json
 
 class GameTimeline(object):
     
-    def __init__(self,  filepath="GameTimeline.json"):
+    def __init__(self, filepath="GameTimeline.json"):
         self.filepath = filepath
         self.events = []
 
@@ -14,9 +14,9 @@ class GameTimeline(object):
       serializedEvents = json.dumps(self.events, sort_keys=True)
       self.events[:] = []
 
-      print(serializedEvents)
+      filepath = self.filepath
 
-      with open(self.filepath, 'w') as f:
+      with open(filepath, 'w') as f:
         print(serializedEvents, file=f)
 
 

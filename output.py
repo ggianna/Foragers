@@ -3,6 +3,7 @@ from utils import Utils;
 import sys;
 import copy;
 from gamemap import GameMap;
+from GameTimeline import GameTimeline
 
 class Output(object):
   def log(self, msg): pass;
@@ -23,7 +24,8 @@ class ConsoleOutput(Output):
     self.msg = "";
     self.nextColor = None;
     self.maxMessages = 10;
-  
+    self.timeline = GameTimeline();
+
   def log(self, msg):
     msg = msg.strip();
     
@@ -68,6 +70,13 @@ class ConsoleOutput(Output):
       # Clear screen
       Utils.cls();
       
+      self.timeline.appendStateActionPair({
+        "treasures": [{"id": "SomeEntity", "pos": {"x": 2, "y": 4}}, {"id": "SomeEntity", "pos": {"x": 4, "y": 4}}],
+        "traps": [{"id": "SomeEntity", "pos": {"x": 1, "y": 5}}, {"id": "SomeEntity", "pos": {"x": 2, "y": 5}}],
+        "allies": [{"id": "SomeEntity", "pos": {"x": 3, "y": 4}}, {"id": "SomeEntity", "pos": {"x": 5, "y": 7}}],
+        "enemies": [{"id": "SomeEntity", "pos": {"x": 1, "y": 6}}, {"id": "SomeEntity", "pos": {"x": 3, "y": 6}}]
+      }, {"text": "something happened", "pos": {"x": 2, "y": 4}})
+
       mapInstance = copy.deepcopy(mapToDraw);
       # Init squares
       mapInstance.squares = [[ colored('...', terrainColor) for iCnt in range(0, mapInstance.xSize) ] for iCnt in range(0, mapInstance.ySize)];
@@ -114,6 +123,8 @@ class ConsoleOutput(Output):
     fOut = open(sFilename, 'w')
     fOut.write(self.msg)
     fOut.close()
+
+    self.timeline.export()
 
 if __name__ == "__main__":
     o = Output();
