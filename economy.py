@@ -2,6 +2,7 @@ class Economy(object):
     def __init__(self,  startMoney = 1000.0):
         self.startMoney = startMoney
         self.baseCost = startMoney / 10
+        self.maxMoney = startMoney * 10
         
     def cost(self,  unit):
         iBaseCost = self.baseCost
