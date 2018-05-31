@@ -348,8 +348,8 @@ class Game(object):
 
 if __name__ == "__main__":
   # Init economy and map
-  economy = Economy(5000);
-  gameMap = gamemap.GameMap(economy, 20, 20, 0.00, 0.10, 0.10, 0.00);  
+  economy = Economy(50);
+  gameMap = gamemap.GameMap(economy,30, 30, 0.00, 0.10, 0.10, 0.00);
   # Init messaging
   output = ConsoleOutput();
   # Init  army
@@ -358,7 +358,14 @@ if __name__ == "__main__":
   army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output, ['BarbarianClass']);
   # Init game
   g = Game(economy,  gameMap,  army,  output, 0.05);
-    
-  
+
+
+  # Init  army
+  # Set colors
+  sAttackerColor = "white";
+  army = Game.selectArmy(economy, gameMap, sAttackerColor, output, ['SoldierClass', 'TechnicianClass', 'MageClass']);
+
+  print str(army);
+
   g.run();
   g.output.saveToFile("log.txt")

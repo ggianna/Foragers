@@ -1,23 +1,21 @@
-#!/usr/bin/python
-from soldiers import *;
-from towers import *;
-from economy import Economy;
-from output import ConsoleOutput;
-import time;
-import math;
-import random;
-import gamemap;
-#from pprint import pformat
+from soldiers import *
+from towers import *
+from economy import Economy
+from output import ConsoleOutput
+import time
+import math
+import random
+import gamemap
+from pprint import pformat
 
 #import pygame;
 #from pygame.locals import *;
 
-from termcolor import colored;
+from termcolor import colored
 #from utils import Utils;
 
 
 class Game(object):
-    
   # Static method definitions
   @staticmethod
   def getInstanceOf(sClassName,  economy,  gameMap):
@@ -28,15 +26,15 @@ class Game(object):
     aUnitPool = [
       "AssassinClass", 
       "BarbarianClass",
-        "CartographerClass", 
+      "CartographerClass",
       "DruidClass",  
       "EnchanterClass", 
       "KnightClass",  
       "MageClass",  
       "RangerClass", 
       "SoldierClass", 
-        "TechnicianClass", 
-        "BridgeBuilderClass", 
+      "TechnicianClass",
+      "BridgeBuilderClass",
       "WizardClass",  
       ]):
       iTotalValue  = 0;
@@ -349,7 +347,8 @@ class Game(object):
 if __name__ == "__main__":
   # Init economy and map
   economy = Economy(5000);
-  gameMap = gamemap.GameMap(economy, 20, 20, 0.00, 0.10, 0.10, 0.00);  
+  gameMap = gamemap.GameMap(economy, 20, 20, 0.00, 0.10, 0.10, 0.00);
+
   # Init messaging
   output = ConsoleOutput();
   # Init  army
