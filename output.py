@@ -98,29 +98,29 @@ class ConsoleOutput(Output):
             # Show the first
             mapInstance.squares[iCnt][iCnt2] = colored(str(squareTreasures[0]), treasureColor);
 
-            viewState["treasures"].append({"id": str(squareTreasures[0]), "pos": {"x": iCnt, "y": iCnt2}})
+            viewState["treasures"].append({"id": type(squareTreasures[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
           else:
             if len(squareFoes) > 0:
               # Show the first
               mapInstance.squares[iCnt][iCnt2] = colored(str(squareFoes[0]), trapColor);
 
-              viewState["enemies"].append({"id": str(squareFoes[0]), "pos": {"x": iCnt, "y": iCnt2}})
+              viewState["traps"].append({"id": type(squareFoes[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
             else:
               # If trap in square
               if (len(squareTraps)) > 0:
                 # Show the first
                 mapInstance.squares[iCnt][iCnt2] = colored(str(squareTraps[0]), trapColor);
 
-                viewState["traps"].append({"id": str(squareTraps[0]), "pos": {"x": iCnt, "y": iCnt2}})
+                viewState["traps"].append({"id": type(squareTraps[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
 
       # Render soldiers
       for cItem in  attackers:
           mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  cItem.color);
-          viewState["allies"].append({"id": str(cItem), "pos": {"x": cItem.x, "y": cItem.y}})
+          viewState["allies"].append({"id": type(cItem).__name__, "pos": {"x": cItem.x, "y": cItem.y}})
           
       for cItem in  defenders:
           mapInstance.squares[cItem.x][cItem.y] = colored(str(cItem),  cItem.color);
-          viewState["enemies"].append({"id": str(cItem), "pos": {"x": cItem.x, "y": cItem.y}})
+          viewState["enemies"].append({"id": type(cItem).__name__, "pos": {"x": cItem.x, "y": cItem.y}})
                 
       # Show map
       for curRow in range(mapInstance.ySize):
@@ -132,10 +132,9 @@ class ConsoleOutput(Output):
       del mapInstance;
 
       # Append state - action pair for the View engine
-      for action in self.actions:
-        self.timeline.appendStateActionPair(viewState, action)
-
-      self.timeline.appendStateActionPair(viewState, {})
+      # for action in self.actions:
+      #   self.timeline.appendStateActionPair(viewState, action)
+      self.timeline.appendStateActionPair(viewState, {"text": "Something happened", "pos": {"x": 4, "y": 5}})
 
       self.actions[:] = []
 
