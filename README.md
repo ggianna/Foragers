@@ -1,4 +1,6 @@
 # Team: Game of Knights
+Fahri, Mario, Aris, Angelos, George
+
 # GameJam title: Idiotic Evolutionary Soldiers
 (Based on the *Foragers* project)
 
@@ -14,10 +16,11 @@ In the GameJam version of the system we:
 - Integrate with the *Mekanimo engine to allow epic replays* (of epicly failing knights)!
 
 # Prerequisites
-deap (you can download from GitHub at https://github.com/blaa/PyGene)
-numpy (as always...)
-pygame (you can download using pip)
-termcolor (you can download using pip)
+- deap (you can download using pip)
+- numpy (as always...)
+- pygame (you can download using pip)
+- termcolor (you can download using pip)
+
 (and probably a few more that we do not have the time to check now... keep us updated!)
 
 ## Do not forget:
@@ -27,5 +30,6 @@ For Mekanimo, talk with Fahri!
 # Running the simulation
 python gameJamDemo.py
 
-# (Moving) Screenshots
-TODO
+# Screenshots
+![Difficult level](./gameofknights_difficult.png)
+![Easy level](./gameofknights_easy.png)
