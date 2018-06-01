@@ -12,6 +12,9 @@ class GameTimeline(object):
 
     def export(self):
       serializedEvents = json.dumps(self.events, sort_keys=True)
+
+      print("exported " + str(len(self.events)), " state - action pairs")
+
       self.events[:] = []
 
       filepath = self.filepath
