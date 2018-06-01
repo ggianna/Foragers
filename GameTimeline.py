@@ -3,9 +3,9 @@ import json
 
 class GameTimeline(object):
     
-    def __init__(self,  filepath="GameTimeline.json"):
-        self.filepath = filepath;
-        self.events = [];
+    def __init__(self, filepath="GameTimeline.json"):
+        self.filepath = filepath
+        self.events = []
 
     def appendStateActionPair(self, state, action):
       self.events.append({"state": state, "action": action})
@@ -14,33 +14,42 @@ class GameTimeline(object):
       serializedEvents = json.dumps(self.events, sort_keys=True)
       self.events[:] = []
 
-      print(serializedEvents)
+      filepath = self.filepath
 
-      with open(self.filepath, 'w') as f:
+      with open(filepath, 'w') as f:
         print(serializedEvents, file=f)
 
-'''
-#######################################
-# Example Usage
-#######################################
 
-#######################################
-# Initialization.
-#######################################
+# #######################################
+# # Example Usage
+# #######################################
 
-gameTimeline = GameTimeline()
+# #######################################
+# # Initialization.
+# #######################################
 
-#######################################
-# Append state - action pairs for the whole simulation.
-#######################################
+# gameTimeline = GameTimeline()
 
-gameTimeline.appendStateActionPair({"hi": "mate"}, {"text": "Did stuff", "x": 2, "y": 4})
-gameTimeline.appendStateActionPair({"hey": "dude"}, {"text": "Did stuff 2", "x": 3, "y": 6})
+# #######################################
+# # Append state - action pairs for the whole simulation.
+# #######################################
 
-#######################################
-# Export everything at the end of the simulation.
-# The timeline is cleaned after export.
-#######################################
+# state = {
+#   "treasures": [{"id": "SomeEntity", "pos": {"x": 2, "y": 4}}, {"id": "SomeEntity", "pos": {"x": 4, "y": 4}}],
+#   "traps": [{"id": "SomeEntity", "pos": {"x": 1, "y": 5}}, {"id": "SomeEntity", "pos": {"x": 2, "y": 5}}],
+#   "allies": [{"id": "SomeEntity", "pos": {"x": 3, "y": 4}}, {"id": "SomeEntity", "pos": {"x": 5, "y": 7}}],
+#   "enemies": [{"id": "SomeEntity", "pos": {"x": 1, "y": 6}}, {"id": "SomeEntity", "pos": {"x": 3, "y": 6}}]
+# }
 
-gameTimeline.export()
-'''
+# gameTimeline.appendStateActionPair(state, {"text": "something happened", "pos": {"x": 2, "y": 4}})
+
+# state["treasures"][0]["pos"]["x"] = 1
+
+# gameTimeline.appendStateActionPair(state, {"text": "something happened", "pos": {"x": 1, "y": 4}})
+
+# #######################################
+# # Export everything at the end of the simulation.
+# # The timeline is cleaned after export.
+# #######################################
+
+# gameTimeline.export()

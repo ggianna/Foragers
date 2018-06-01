@@ -1,0 +1,6 @@
+
+Starting money:100$
+Total army value: 0$
+Game begins!
+Score: 1 after 1 time
+No Attackers left! Defenders win!

@@ -3,6 +3,7 @@ class Economy(object):
         self.startMoney = startMoney
         self.baseCost = startMoney / 10
         self.maxMoney = startMoney * 10
+
         
     def cost(self,  unit):
         iBaseCost = self.baseCost
