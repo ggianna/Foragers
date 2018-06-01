@@ -104,7 +104,7 @@ class ConsoleOutput(Output):
               # Show the first
               mapInstance.squares[iCnt][iCnt2] = colored(str(squareFoes[0]), trapColor);
 
-              viewState["traps"].append({"id": type(squareFoes[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
+              viewState["enemies"].append({"id": type(squareFoes[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
             else:
               # If trap in square
               if (len(squareTraps)) > 0:
