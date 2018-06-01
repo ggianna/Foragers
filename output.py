@@ -104,7 +104,7 @@ class ConsoleOutput(Output):
               # Show the first
               mapInstance.squares[iCnt][iCnt2] = colored(str(squareFoes[0]), trapColor);
 
-              viewState["traps"].append({"id": type(squareFoes[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
+              viewState["enemies"].append({"id": type(squareFoes[0]).__name__, "pos": {"x": iCnt, "y": iCnt2}})
             else:
               # If trap in square
               if (len(squareTraps)) > 0:
@@ -132,9 +132,9 @@ class ConsoleOutput(Output):
       del mapInstance;
 
       # Append state - action pair for the View engine
-      # for action in self.actions:
-      #   self.timeline.appendStateActionPair(viewState, action)
-      self.timeline.appendStateActionPair(viewState, {"text": "Something happened", "pos": {"x": 4, "y": 5}})
+      for action in self.actions:
+        self.timeline.appendStateActionPair(viewState, action)
+      # self.timeline.appendStateActionPair(viewState, {"text": "Something happened", "pos": {"x": 4, "y": 5}})
 
       self.actions[:] = []
 

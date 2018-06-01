@@ -1,6 +1,211 @@
 
-Starting money:100$
-Total army value: 0$
+Starting money:50000$
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Selected BarbarianClass for 1275$.
+Total army value: 49725$
 Game begins!
-Score: 1 after 1 time
-No Attackers left! Defenders win!
+* /R\ attacks /B\ with a BOW, leaving the latter with 123 hp.
+/R\139987831779 attacks /B\139987831941 with a physical attack.
+Target is hit for 13 damage. 110 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 8.00 and attack speed is 54.00.[0m[37m/B\139987831853 attacks /R\139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 79 hit points remaining.[0m[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 7.82 and attack speed is 54.31.[0m[37m/B\139987831941 attacks /R\139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 68 hit points remaining.[0m
+* /R\ attacks /B\ with a BOW, leaving the latter with 123 hp.
+/R\139987831779 attacks /B\139987831853 with a physical attack.
+Target is hit for 13 damage. 110 hit points remaining.
+/R\139987831779 attacks /B\139987831941 with a physical attack.
+Target is hit for 13 damage. 97 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 7.50 and attack speed is 54.90.[0m[37m/B\139987831941 attacks /R\139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 57 hit points remaining.[0m
+/R\139987831779 attacks /B\139987831941 with a physical attack.
+Target is hit for 14 damage. 83 hit points remaining.
+/R\139987831779 attacks /B\139987831941 with a physical attack.
+Target is hit for 14 damage. 69 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 6.89 and attack speed is 56.11.[0m[37m/B\139987831941 attacks /R\139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 46 hit points remaining.[0m[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 8.00 and attack speed is 54.00.[0m[37m/B\139987831905 attacks /R\139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 35 hit points remaining.[0m
+_R_139987831779 attacks /B\139987831941 with a physical attack.
+Target is hit for 14 damage. 55 hit points remaining.
+_R_139987831779 attacks /B\139987831905 with a physical attack.
+Target is hit for 13 damage. 112 hit points remaining.[37m* _B_ is enraged! Defense is decreased. Attack speed is increased. Now defence is 6.20 and attack speed is 57.66.[0m[37m_B_139987831941 attacks _R_139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 24 hit points remaining.[0m[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 7.84 and attack speed is 54.28.[0m[37m/B\139987831905 attacks  R 139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 13 hit points remaining.[0m
+R 139987831779 attacks _B_139987831941 with a physical attack.
+Target is hit for 14 damage. 41 hit points remaining.
+R 139987831779 attacks /B\139987831905 with a physical attack.
+Target is hit for 13 damage. 99 hit points remaining.[37m* _B_ is enraged! Defense is decreased. Attack speed is increased. Now defence is 5.47 and attack speed is 59.58.[0m[37m_B_139987831941 attacks  R 139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. 2 hit points remaining.[0m
+R 139987831779 attacks _B_139987831941 with a physical attack.
+Target is hit for 15 damage. 26 hit points remaining.[37m*  B  is enraged! Defense is decreased. Attack speed is increased. Now defence is 4.73 and attack speed is 61.92.[0m[37mB 139987831941 attacks  R 139987831779 with a physical attack.[0m[37mTarget is hit for 11 damage. -9 hit points remaining.[0m
+Defender139987831779024 has died!
+The time is now 100...[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 8.00 and attack speed is 54.00.[0m[37m/B\139987831904 attacks /X\139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. 68 hit points remaining.[0m
+The time is now 200...
+* /X\ THROWS A DAGGER to /B\, leaving the latter with 124 hp.
+/X\139987831854 attacks /B\139987831904 with a physical attack.
+Target is hit for 10 damage. 114 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 7.86 and attack speed is 54.24.[0m[37m/B\139987831904 attacks /X\139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. 56 hit points remaining.[0m
+* /X\ THROWS A DAGGER to /B\, leaving the latter with 113 hp.
+/X\139987831854 attacks /B\139987831904 with a physical attack.
+Target is hit for 10 damage. 103 hit points remaining.
+* /X\ THROWS A DAGGER to /B\, leaving the latter with 102 hp.
+/X\139987831854 attacks /B\139987831904 with a physical attack.
+Target is hit for 10 damage. 92 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 7.47 and attack speed is 54.95.[0m[37m/B\139987831904 attacks /X\139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. 44 hit points remaining.[0m
+* /X\ THROWS A DAGGER to /B\, leaving the latter with 91 hp.
+/X\139987831854 attacks /B\139987831904 with a physical attack.
+Target is hit for 10 damage. 81 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 6.98 and attack speed is 55.92.[0m[37m/B\139987831904 attacks /X\139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. 32 hit points remaining.[0m
+* _X_ THROWS A DAGGER to /B\, leaving the latter with 80 hp.
+_X_139987831854 attacks /B\139987831904 with a physical attack.
+Target is hit for 10 damage. 70 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 6.41 and attack speed is 57.15.[0m[37m/B\139987831904 attacks _X_139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. 20 hit points remaining.[0m
+X 139987831854 attacks /B\139987831904 with a physical attack.
+Target is hit for 11 damage. 59 hit points remaining.[37m* /B\ is enraged! Defense is decreased. Attack speed is increased. Now defence is 8.00 and attack speed is 54.00.[0m[37m/B\139987831855 attacks  X 139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. 8 hit points remaining.[0m[37m* _B_ is enraged! Defense is decreased. Attack speed is increased. Now defence is 5.80 and attack speed is 58.66.[0m[37m_B_139987831904 attacks  X 139987831854 with a physical attack.[0m[37mTarget is hit for 12 damage. -4 hit points remaining.[0m
+Defender139987831854864 has died!
+The time is now 300...
+The time is now 400...
+B  got provisions!
+The time is now 500...
+[37m
+Attacker[0m139987831904144 has died!
+...in fact it was STARVATION...
+Remaining attackers: /B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\, B ,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\,/B\
+/B\ got provisions!
+/B\ got provisions!
+/B\ got provisions!
+/B\ got provisions!
+[37m
+Attacker[0m139987831941200 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831855248 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831854800 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831904528 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831902544 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831902608 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831856208 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831855632 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831939664 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831853840 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831904912 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831902992 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831941968 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831778448 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831856016 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831940048 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831853392 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831903376 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831854352 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831905616 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831905680 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831904848 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831903760 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831856400 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831940816 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831940432 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831857104 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831906064 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831904080 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831906256 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831855440 has died!
+...in fact it was STARVATION...
+Remaining attackers: /B\,/B\,/B\,/B\,/B\,/B\, B
+/B\ got provisions!
+[37m
+Attacker[0m139987831939280 has died!
+...in fact it was STARVATION...
+Remaining attackers: /B\,/B\,/B\,/B\,/B\, B
+The time is now 600...
+The time is now 700...
+[37m
+Attacker[0m139987831905296 has died!
+...in fact it was STARVATION...
+[37m
+Attacker[0m139987831903312 has died!
+...in fact it was STARVATION...
+Remaining attackers:  B ,/B\,/B\,/B\
+The time is now 800...
+The time is now 900...
+The time is now 1000...
+Score: 7309 after 1000 time
+Foraging complete! 35 died and 4 remain.

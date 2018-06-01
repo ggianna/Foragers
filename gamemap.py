@@ -33,26 +33,26 @@ class GameMap(object):
         self.applyTreasures();
         self.applyFoes();
         
-    def applyTraps(self, possibleTraps = ["TrapClass", "Pit", "ArrowSlit", "Explosion", "Labyrinth"]):
+    def applyTraps(self, possibleTraps = ["Pit"]): #, "TrapClass", "ArrowSlit", "Explosion", "Labyrinth"]):
         # Apply traps
         self.traps = [];
         # Omit 0,0 because it is HOME
         for iCnt in range(1,  self.xSize): 
           for iCnt2 in range(1,  self.ySize):
-	    if iCnt == self.homePos[0] and iCnt2 == self.homePos[1]:
-	      continue # Do not put anything at home
-            if (random.random() < self.trapProbability):
-              curTrap = self.getInstanceOfTrap(random.choice(possibleTraps));
-              curTrap.x = iCnt;
-              curTrap.y = iCnt2;
+	        if iCnt == self.homePos[0] and iCnt2 == self.homePos[1]:
+	          continue # Do not put anything at home
+          if (random.random() < self.trapProbability):
+            curTrap = self.getInstanceOfTrap(random.choice(possibleTraps));
+            curTrap.x = iCnt;
+            curTrap.y = iCnt2;
+        
+            self.traps.append(curTrap);
           
-              self.traps.append(curTrap);
           
-          
-    def applyTreasures(self, possibleTreasures = ["TreasureClass", "SmallTreasure", "BigTreasure", "HugeTreasure",
-                  "Ration", "SmallRation", "BigRation", "HugeRation",
-                  "Chest", "SmallChest", "BigChest", "HugeChest"
-                  ]):
+    def applyTreasures(self, possibleTreasures = ["TreasureClass"]):#, "SmallTreasure", "BigTreasure", "HugeTreasure",
+                  # "Ration", "SmallRation", "BigRation", "HugeRation",
+                  # "Chest", "SmallChest", "BigChest", "HugeChest"
+                  # ]):
         # Apply treasures
         for iCnt in range(0,  self.xSize): 
           for iCnt2 in range(0,  self.ySize):
@@ -66,17 +66,17 @@ class GameMap(object):
               self.treasures.append(curTreasure);
           
     def applyFoes(self, possibleFoes = [ 
-        "AssassinClass",  "BarbarianClass",
+        # "AssassinClass",  "BarbarianClass",
 #        "CartographerClass", 
-      "DruidClass",  
-      "EnchanterClass", 
-      "KnightClass",  
+      # "DruidClass",  
+      # "EnchanterClass", 
+      # "KnightClass",  
       "MageClass",  
-      "RangerClass", 
+      # "RangerClass", 
       "SoldierClass", 
-#        "TechnicianClass", 
+      #  "TechnicianClass", 
 #        "BridgeBuilderClass", 
-      "WizardClass",  
+      # "WizardClass",  
                   ],
       possibleTowers = ["FireElementalistTower",  "Fort", "TowerClass", 
         "IllusionistTower", "WaterElementalistTower",]):
