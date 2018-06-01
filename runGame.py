@@ -347,8 +347,8 @@ class Game(object):
 if __name__ == "__main__":
   # Init economy and map
   economy = Economy(5000);
-  gameMap = gamemap.GameMap(economy, 10, 10, 0.10, 0.10, 0.10, 0.00);
 
+  gameMap = gamemap.GameMap(economy, 10, 10, 0.00, 0.10, 0.10, 0.00);
   # Init messaging
   output = ConsoleOutput();
   # Init  army
@@ -357,7 +357,8 @@ if __name__ == "__main__":
   army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output);
   # Init game
   g = Game(economy,  gameMap,  army,  output, 0.05);
-    
-  
-  g.run();
+
+
+  evaluation = g.run();
+  print("Final evaluation of the map",evaluation);
   g.output.saveToFile("log.txt")
