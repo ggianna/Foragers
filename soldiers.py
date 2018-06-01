@@ -33,8 +33,19 @@ class SoldierClass(object):
         self.treasure = 0;
         self.score = 0.0;
         
+        self.previousHp = self.currentHp;
+        self.previousTreasure = self.treasure;
+        self.previousScore = self.score;
+
         self.economy = economy;
         self.gameMap = gameMap;
+
+    def classType(self):
+        return type(self).__name__
+
+    def description(self):
+        return self.classType() + "stats(hp: " + str(self.currentHp) + "/" + str(self.hp) + ", mp: " + str(self.currentMp) + "/" + str(self.mp) + ", fullness" + str(self.fullness) + ", treasure: " + str(self.treasure) + ", score: " + str(self.score) + ")";
+        # return "%s Stats: HP %d/%d, MP %d/%d, fullness: %d, treasure: %d, score: %d"%*(self.classType(), self.currentHp, self.hp, self.currentMp, self.mp, self.fullness, self.treasure, self.score) 
 
     def foesToAttack(self,  friends,  foes):
         res = [];
@@ -54,21 +65,49 @@ class SoldierClass(object):
         
         return res;
 
+    def lastActionResolution(self):
+        hpDiff = self.currentHp - self.previousHp;
+        treasureDiff = self.treasure - self.previousTreasure;
+        scoreDiff = self.score - self.previousScore;
+
+        return hpDiff + treasureDiff + scoreDiff;  
+
+    def lastHpDiff(self):
+        return self.currentHp - self.previousHp;
+
+    def lastTreasureDiff(self):
+        return self.treasure - self.previousTreasure;
+
+    def lastScoreDiff(self):
+        return self.score - self.previousScore;
+
     def act(self,  friends,  foes,  game, canMove = True,  canInteractWTraps = True,  canInteractWFoes = True,  canInteractWTreasure = True, 
       canInteractWHome = True):
         bActed = False
         
+        self.previousHp = self.currentHp;
+        self.previousTreasure = self.treasure;
+        self.previousScore = self.score;
+
         lTraps = self.gameMap.getTraps(self.x,  self.y);
         lTreasures = self.gameMap.getTreasures(self.x,  self.y);
         lFoes = self.foesToAttack(friends,  foes);
         lFriends = self.friendsNear(friends,  foes);
         
+        nextPosX = self.x;
+        nextPosY = self.y;
+        
         # Decide move
         if canMove:
-          mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
-          bActed = True
+            mMove = self.strategy.decideMove(lFriends,  lFoes,  self.gameMap);
+
+            nextPosX += mMove[0]
+            nextPosY += mMove[1]
+
+            game.output.logAction(self.description() + " is moving towards direction (" + str(mMove) + ").", nextPosX, nextPosY);
+            bActed = True
         else:
-          mMove = (0,0)
+            mMove = (0,0)
         # DEBUG LINES
 #        game.output.log("Moving:" + str(mMove));
         ##########
@@ -88,6 +127,7 @@ class SoldierClass(object):
                 ##########
                 if not game.interactWithTrap(self,  curTrap,  lFriends,  lFoes,  [curTrap]):
                   bActed = True
+                  game.output.logAction(self.description() + " interacted with trap.", nextPosX, nextPosY);
                   return bActed;
                 
         if canInteractWFoes and len(lFoes) > 0:
@@ -97,6 +137,7 @@ class SoldierClass(object):
                 ##########
                 if not game.interactWithFoe(self,  curFoe,  lFriends,  lFoes):
                   bActed = True
+                  game.output.logAction(self.description() + " battled with enemy.", nextPosX, nextPosY);
                   return bActed;
                 
         if canInteractWTreasure and len(lTreasures) > 0:
@@ -106,13 +147,15 @@ class SoldierClass(object):
                 ##########
                 if not game.interactWithTreasure(self,  curTreasure,  lFriends,  lFoes):
                   bActed = True
+                  game.output.logAction(self.description() + " acquired treasure.", nextPosX, nextPosY);
                   return bActed;
 
         if canInteractWHome and self.x == self.gameMap.homePos[0] and self.y == self.gameMap.homePos[1]:
           if not game.interactWithHome(self):
             bActed = True
+            game.output.logAction(self.description() + " got back home.", nextPosX, nextPosY);
             return bActed;
-
+      
         return bActed
     
     def move(self, moveTuple):
