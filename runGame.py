@@ -346,19 +346,23 @@ class Game(object):
 
 if __name__ == "__main__":
   # Init economy and map
-  economy = Economy(5000);
+  economy = Economy(500);
 
-  gameMap = gamemap.GameMap(economy, 10, 10, 0.00, 0.10, 0.10, 0.00);
+  gameMap = gamemap.GameMap(economy, 10, 10, 0.1, 0.1, 0.05, 0.05);
   # Init messaging
   output = ConsoleOutput();
   # Init  army
   # Set colors
   sAttackerColor = "white";
   army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output);
+
+  # Output game data
+  sGameStats = ("Traps: %d, Treasures: %d, Foes: %d, Army: %d"%(len(gameMap.traps), len(gameMap.treasures), len(gameMap.foes), len(army)))
   # Init game
   g = Game(economy,  gameMap,  army,  output, 0.05);
 
 
   evaluation = g.run();
   print("Final evaluation of the map",evaluation);
+  print("Map info: " + sGameStats)
   g.output.saveToFile("log.txt")
