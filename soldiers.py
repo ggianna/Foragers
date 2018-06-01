@@ -40,6 +40,10 @@ class SoldierClass(object):
         self.economy = economy;
         self.gameMap = gameMap;
 
+    def setMap(self, newMap):
+        self.gameMap = newMap
+        self.strategy.homePos = newMap.homePos
+
     def classType(self):
         return type(self).__name__
 
