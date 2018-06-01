@@ -2,9 +2,10 @@
 import random
 import copy
 from runGame import Game
-from output import Output
+from output import *
 from economy import Economy
 from gamemap import GameMap
+import os
 
 
 def updateArmyWithCurrentMap(fodderArmy, newMap):
@@ -24,6 +25,7 @@ def runGameMap(economy, map, army, output):
     # We create a new game, with the changeable map
     g = Game(economy, changeableMap, fodderArmy, output, 0.0);
     score = g.run()
+    output.saveToFile("GameTimeline.json")
 
     return score
 
@@ -35,7 +37,7 @@ def main():
     # Init economy
     economy = Economy(500);
     # Init messaging
-    output = Output();
+    output = ConsoleOutput();
     # Set colors
     sAttackerColor = "white";
 
@@ -44,14 +46,16 @@ def main():
     army = Game.selectArmy(economy, gameMap, "white", output)
 
     # For this army, create 3 maps (1 easy, 1 average, 1 difficult)
-    for pParams in [(0.01, 0.10, 0.01, 0.01, "easy"), (0.1, 0.10, 0.1, 0.1, "medium"),
-                    (0.2, 0.10, 0.2, 0.2, "difficult")]:
+    for pParams in [(0.01, 0.15, 0.01, 0.01, "easy"), (0.05, 0.15, 0.11, 0.08, "medium"),
+                    (0.03, 0.01, 0.12, 0.08, "difficult")]:
         gameMap = GameMap(economy, 10, 10, pParams[0], pParams[1], pParams[2], pParams[3]);
         # Run the easy 10 times
         allScores = []
         for iCnt in range(10):
             score = runGameMap(economy, gameMap, army, output)
             allScores += [score]
+
+        os.rename("GameTimeline.json", "GameTimeline%s.json"%(pParams[4]))
 
         print str(pParams) + ":" + str(allScores)
     # Record the avg performance and stdev
