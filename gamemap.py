@@ -78,8 +78,11 @@ class GameMap(object):
 #        "BridgeBuilderClass", 
       # "WizardClass",  
                   ],
-      possibleTowers = ["FireElementalistTower",  "Fort", "TowerClass", 
-        "IllusionistTower", "WaterElementalistTower",]):
+      possibleTowers = [
+          #"FireElementalistTower",  "Fort",
+          "TowerClass",
+        #"IllusionistTower", "WaterElementalistTower",
+      ]):
         # Apply foes
         for iCnt in range(0,  self.xSize): 
           for iCnt2 in range(0,  self.ySize):
