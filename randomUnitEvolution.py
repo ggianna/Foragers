@@ -19,8 +19,6 @@ class RandomUnitEvolution():
         for unitIdx in range(len(newArmy)):
             # Get the i-th unit of the army
             unitToOptimize = newArmy[unitIdx]
-
-
             bestUnit = copy.deepcopy(unitToOptimize)
             bestScore = 0
             for i in range(1, 100):

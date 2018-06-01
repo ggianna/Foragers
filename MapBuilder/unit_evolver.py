@@ -12,32 +12,34 @@ from deap import creator
 from deap import tools
 
 
-def EvaluateMap(chromosome = [0.00, 0.10, 0.10, 0.00] , economy = Economy(50) ):
-    # Init economy and map
+def updateArmyWithCurrentMap(fodderArmy, newMap):
+    for unit in fodderArmy:
+        unit.setMap(newMap)
+    return fodderArmy
 
-    economy = Economy(50);
-    gameMap = gamemap.GameMap(economy, 10, 10,  *chromosome)
-    output = Output()
-    times = 30
-    mapcopy = copy.deepcopy(gameMap)
 
-    armies = [ Game.selectArmy(economy, mapcopy, armyColor="white", output=Output(), aUnitPool= ['SoldierClass', 'TechnicianClass', 'MageClass'])
-                for _ in range(times)]
+def EvaluateUnit(chromosome=[0.00, 0.10, 0.10, 0.00], currentUnit = None ,currenArmy = None, gameMap = None, economy = None, unitIdx = None ):
+        # Create an instance of our army, based on the original army, which we will use in a given game
+        fodderArmy = copy.deepcopy(currenArmy)
+        # Create a (changeable) map, based on the original map
+        changeableMap = copy.deepcopy(gameMap)
 
-    score = sum([Game(economy, mapcopy, army, output, 0.0).run() for army in armies])
+        currentUnit.strategy.curiosity = chromosome[0]
+        currentUnit.strategy.groupSpirit = chromosome[1]
+        currentUnit.strategy.riskiness = {"SoldierClass": chromosome[2], "TrapClass": chromosome[3],
+                  "TowerClass": chromosome[4]};  # Base probability to get closer to interact
+        currentUnit.strategy.fasting = chromosome[5];  # Base probability to return if hungry
+        currentUnit.strategy.greed = chromosome[6];  # Base probability to reach for loot, when not enough has been collected  # Update the fodder army with the altered unit
+        fodderArmy[unitIdx] = currentUnit
+        updateArmyWithCurrentMap(fodderArmy, changeableMap);
 
-    print(score/times)
+        # We create a new game, with the changeable map
+        output = Output()
+        g = Game(economy, changeableMap, fodderArmy, output, 0.0);
 
-    return  score/times,
+        score = g.run()
+        return  score,
 
-def printMap(params ):
-    economy = Economy(50)
-    gameMap = gamemap.GameMap(economy, 10, 10,  *params)
-    output = ConsoleOutput()
-    output.drawMap(gameMap, [],[] )
-    
-
-    print(gameMap)
 
 
 
@@ -45,21 +47,19 @@ creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 # Attribute generator
-toolbox.register("attr_float", random.uniform, 0.01, 0.2)
+toolbox.register("attr_float", random.random)
 # Structure initializers
 toolbox.register("individual", tools.initRepeat, creator.Individual,
-                 toolbox.attr_float, n=4)
+                 toolbox.attr_float, n=7)
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-toolbox.register("evaluate", EvaluateMap)
+toolbox.register("evaluate", EvaluateUnit)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.1, indpb=0.05)
 toolbox.register("select", tools.selTournament, tournsize=4)
 
 
-
-
-def main(popsize, generations):
+def main(popsize, generations, currentUnit = None ,currenArmy = None, gameMap = None, economy = None, unitIdx = None ):
     random.seed(64)
 
     # create an initial population of 300 individuals (where
@@ -76,7 +76,9 @@ def main(popsize, generations):
     print("Start of evolution")
 
     # Evaluate the entire population
-    fitnesses = list(map(toolbox.evaluate, pop))
+    #fitnesses = list(map(toolbox.evaluate, pop))
+
+    fitnesses = [toolbox.evaluate(x,  currentUnit, currenArmy, gameMap, economy, unitIdx) for x in pop]
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
 
@@ -89,7 +91,7 @@ def main(popsize, generations):
     g = 0
 
     # Begin the evolution
-    while  g < generations:
+    while g < generations:
         # A new generation
         g = g + 1
         print("-- Generation %i --" % g)
@@ -120,7 +122,7 @@ def main(popsize, generations):
 
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(toolbox.evaluate, invalid_ind)
+        fitnesses = [toolbox.evaluate(x,  currentUnit, currenArmy, gameMap, economy, unitIdx) for x in invalid_ind]
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
@@ -150,26 +152,24 @@ def main(popsize, generations):
 
 if __name__ == "__main__":
 
-    main(popsize= 10,generations= 20)
+    economy = Economy()
+    output = Output()
+    curmap = gamemap.GameMap(economy)
+
+    army = Game.selectArmy(economy, curmap, armyColor="white", output=Output(),
+                    aUnitPool=['SoldierClass', 'TechnicianClass', 'MageClass'])
+    for unit in  army:
+
+        index = 0
+
+    main(popsize=10, generations=20,  currentUnit = army[index] ,currenArmy = army, gameMap = curmap, economy = economy, unitIdx = index)
 
     # Super Difficult level:
-    #printMap([0.8031057995895188, 0.20136711521936546, 0.8194173185392594, 0.6529689056798653])
+    # printMap([0.8031057995895188, 0.20136711521936546, 0.8194173185392594, 0.6529689056798653])
 
     # Difficult level
-    #EvaluateMap([0.03002840378487342, 0.01868680484970526, 0.12188740611196378, 0.08543245449223595])
-    #printMap([0.03002840378487342, 0.01868680484970526, 0.12188740611196378, 0.08543245449223595])
+    # EvaluateMap([0.03002840378487342, 0.01868680484970526, 0.12188740611196378, 0.08543245449223595])
+    # printMap([0.03002840378487342, 0.01868680484970526, 0.12188740611196378, 0.08543245449223595])
 
 
     # Medium Level
-    #EvaluateMap([0.05061390561025093, 0.15105454315308003, 0.11443900563648232, 0.07817581464909679])
-
-    #printMap( [0.05061390561025093, 0.15105454315308003, 0.11443900563648232, 0.07817581464909679])
-
-
-
-
-
-
-
-
-
