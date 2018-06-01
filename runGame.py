@@ -24,18 +24,18 @@ class Game(object):
   @staticmethod
   def selectArmy(eEconomy,  gameMap,  armyColor,  output,  
     aUnitPool = [
-      "AssassinClass", 
-      "BarbarianClass",
-      "CartographerClass",
-      "DruidClass",  
-      "EnchanterClass", 
+      #"AssassinClass",
+      #"BarbarianClass",
+      #"CartographerClass",
+      #"DruidClass",
+      #"EnchanterClass",
       "KnightClass",  
       "MageClass",  
-      "RangerClass", 
-      "SoldierClass", 
+      #"RangerClass",
+      #"SoldierClass",
       "TechnicianClass",
-      "BridgeBuilderClass",
-      "WizardClass",  
+      #"BridgeBuilderClass",
+      #"WizardClass",
       ]):
       iTotalValue  = 0;
       aArmy = [];
@@ -304,7 +304,7 @@ class Game(object):
             self.repaintTerrain();
             output.log("\n");
             self.printGameState();
-            time.sleep(3 * msgBaseDelaySecs);
+            #time.sleep(3 * msgBaseDelaySecs);
             iRowCnt += 1;
             if (iRowCnt >= 5 or bShouldRepaint):
                 if (bShouldRepaint):
@@ -347,7 +347,7 @@ class Game(object):
 if __name__ == "__main__":
   # Init economy and map
   economy = Economy(5000);
-  gameMap = gamemap.GameMap(economy, 20, 20, 0.00, 0.10, 0.10, 0.00);
+  gameMap = gamemap.GameMap(economy, 10, 10, 0.00, 0.10, 0.10, 0.00);
 
   # Init messaging
   output = ConsoleOutput();
@@ -357,7 +357,8 @@ if __name__ == "__main__":
   army = Game.selectArmy(economy,  gameMap,  sAttackerColor,  output, ['BarbarianClass']);
   # Init game
   g = Game(economy,  gameMap,  army,  output, 0.05);
-    
-  
-  g.run();
+
+
+  evaluation = g.run();
+  print("Final evaluation of the map",evaluation);
   g.output.saveToFile("log.txt")
