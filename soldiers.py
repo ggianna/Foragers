@@ -44,7 +44,7 @@ class SoldierClass(object):
         return type(self).__name__
 
     def description(self):
-        return self.classType() + "stats(hp: " + str(self.currentHp) + "/" + str(self.hp) + ", mp: " + str(self.currentMp) + "/" + str(self.mp) + ", fullness" + str(self.fullness) + ", treasure: " + str(self.treasure) + ", score: " + str(self.score) + ")";
+        return self.classType() + " stats[hp: " + str(self.currentHp) + "/" + str(self.hp) + ", mp: " + str(self.currentMp) + "/" + str(self.mp) + ", fullness: " + str(self.fullness) + ", treasure: " + str(self.treasure) + ", score: " + str(self.score) + "]";
         # return "%s Stats: HP %d/%d, MP %d/%d, fullness: %d, treasure: %d, score: %d"%*(self.classType(), self.currentHp, self.hp, self.currentMp, self.mp, self.fullness, self.treasure, self.score) 
 
     def foesToAttack(self,  friends,  foes):
