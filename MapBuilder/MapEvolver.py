@@ -5,7 +5,7 @@ from output import ConsoleOutput, Output
 from runGame import Game
 import gamemap
 import deap
-import random
+import random, copy
 
 from deap import base
 from deap import creator
@@ -14,16 +14,21 @@ from deap import tools
 
 def EvaluateMap(chromosome = [0.00, 0.10, 0.10, 0.00] , economy = Economy(50) ):
     # Init economy and map
+
     economy = Economy(50);
     gameMap = gamemap.GameMap(economy, 30, 30,  *chromosome)
     output = Output()
+    times = 30
+    mapcopy = copy.deepcopy(gameMap)
 
-    armies = [ Game.selectArmy(economy, gameMap, armyColor="white", output=Output(), aUnitPool= ['SoldierClass', 'TechnicianClass', 'MageClass'])
-                for _ in range(2)]
-    score = sum([Game(economy, gameMap, army, output, 0.0).run() for army in armies])
-    print(score)
+    armies = [ Game.selectArmy(economy, mapcopy, armyColor="white", output=Output(), aUnitPool= ['SoldierClass', 'TechnicianClass', 'MageClass'])
+                for _ in range(times)]
 
-    return  score,
+    score = sum([Game(economy, mapcopy, army, output, 0.0).run() for army in armies])
+
+    print(score/times)
+
+    return  score/times,
 
 def printMap(params ):
     economy = Economy(50)
@@ -36,8 +41,8 @@ def printMap(params ):
 
 
 
-creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-creator.create("Individual", list, fitness=creator.FitnessMin)
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 # Attribute generator
 toolbox.register("attr_float", random.uniform, 0.01, 0.2)
@@ -48,23 +53,18 @@ toolbox.register("individual", tools.initRepeat, creator.Individual,
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", EvaluateMap)
 toolbox.register("mate", tools.cxTwoPoint)
-toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.5, indpb=0.05)
+toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.1, indpb=0.05)
 toolbox.register("select", tools.selTournament, tournsize=4)
 
 
 
 
-
-
-
-
-
-def main():
+def main(popsize, generations):
     random.seed(64)
 
     # create an initial population of 300 individuals (where
     # each individual is a list of integers)
-    pop = toolbox.population(n=5)
+    pop = toolbox.population(n=popsize)
     print pop
 
     # CXPB  is the probability with which two individuals
@@ -89,7 +89,7 @@ def main():
     g = 0
 
     # Begin the evolution
-    while  g < 10:
+    while  g < generations:
         # A new generation
         g = g + 1
         print("-- Generation %i --" % g)
@@ -149,11 +149,18 @@ def main():
 
 
 if __name__ == "__main__":
-    #EvaluateMap()
-    #main()
-    #printMap([0.8031057995895188, 0.20136711521936546, 0.8194173185392594, 0.6529689056798653])
-    printMap([0.10047006982357568, 0.12974162032058817, 0.08675258421800985, 0.18480456240850213])
 
+    main(popsize= 10,generations= 20)
+
+    # Super Difficult level:
+    #printMap([0.8031057995895188, 0.20136711521936546, 0.8194173185392594, 0.6529689056798653])
+
+    # Difficult level
+    #EvaluateMap([0.03002840378487342, 0.01868680484970526, 0.12188740611196378, 0.08543245449223595])
+    #printMap([0.03002840378487342, 0.01868680484970526, 0.12188740611196378, 0.08543245449223595])
+
+
+    # Medium Level
 
 
 

@@ -120,6 +120,7 @@ class Game(object):
     
   def interactWithTreasure(self,  actor,  treasure,  friends,  foes):
       treasure.applyEffectTo(actor);
+
       self.gameMap.treasures.remove(treasure);
       # Reward actor
       actor.score += self.economy.treasureValue(treasure);
