@@ -12,13 +12,17 @@ class RandomUnitEvolution():
         pass
 
     def evolveEachUnit(self, economy,  gameMap,  army):
+        scores = []
         output = Output() # Dummy output
         newArmy = copy.deepcopy(army)
 
         # For each unit
+        i = 1
         for unitIdx in range(len(newArmy)):
             # Get the i-th unit of the army
             unitToOptimize = newArmy[unitIdx]
+            print (i)
+
             bestUnit = copy.deepcopy(unitToOptimize)
             bestScore = 0
             for i in range(1, 100):
@@ -40,9 +44,15 @@ class RandomUnitEvolution():
                     bestScore = score
                     bestUnit = alteredUnit
 
-                print ("Run %d"%(i))
+                print(bestScore)
+
+                #print ("Run %d"%(i))
             # Update the army
             newArmy[unitIdx] = bestUnit
+            scores.append((bestScore,bestUnit))
+            i = i + 1
+            scores.sort(reverse=True)
+        return scores
 
     def updateArmyWithCurrentMap(self, fodderArmy, newMap):
         for unit in fodderArmy:
@@ -69,7 +79,7 @@ def main():
     output = Output()
     curmap = GameMap(economy)
     myevol = RandomUnitEvolution()
-    myevol.evolveEachUnit(economy, curmap, Game.selectArmy(economy, curmap, "white", output))
+    print (myevol.evolveEachUnit(economy, curmap, Game.selectArmy(economy, curmap, "white", output)))
 
 if __name__ == '__main__':
     main()
