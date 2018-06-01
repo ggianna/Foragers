@@ -151,20 +151,12 @@ def main(popsize, generations, currentUnit = None ,currenArmy = None, gameMap = 
     print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
     return best_ind,best_ind.fitness.values[0]
 
-
-if __name__ == "__main__":
-
-    economy = Economy()
-    output = Output()
-    curmap = gamemap.GameMap(economy)
-
-    army = Game.selectArmy(economy, curmap, armyColor="white", output=Output(),
-                    aUnitPool=['SoldierClass', 'TechnicianClass', 'MageClass'])
+def getArmy(army, curmap, economy, popsize = 20, generations = 100):
     scores = []
     for index, unit in enumerate(army):
         print "Treasures:",len(curmap.treasures),
 
-        evolvedParams, best = main(popsize=100, generations=20,  currentUnit = army[index] ,currenArmy = army, gameMap = curmap, economy = economy, unitIdx = index)
+        evolvedParams, best = main(popsize, generations,  currentUnit = army[index] ,currenArmy = army, gameMap = curmap, economy = economy, unitIdx = index)
         scores.append(( best, evolvedParams))
         army[index].strategy.curiosity = evolvedParams[0]
         army[index].strategy.groupSpirit = evolvedParams[1]
@@ -175,8 +167,19 @@ if __name__ == "__main__":
         for u in army[:5]:
             print u.strategy.curiosity
 
-    scores.sort(reverse=True)
-    for score in scores[:5]:
-        print(score)
+    # scores.sort(reverse=True)
+    # for score in scores[:5]:
+    #     print(score)
+    return army
+
+
+if __name__ == "__main__":
+
+    economy = Economy()
+    output = Output()
+    curmap = gamemap.GameMap(economy)
+
+    army = Game.selectArmy(economy, curmap, armyColor="white", output=Output(),
+                    aUnitPool=['SoldierClass', 'TechnicianClass', 'MageClass'])
 
 
