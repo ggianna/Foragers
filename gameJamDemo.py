@@ -6,6 +6,8 @@ from output import *
 from economy import Economy
 from gamemap import GameMap
 import os
+from randomUnitEvolution import RandomUnitEvolution
+import MapBuilder.unit_evolver
 
 
 def updateArmyWithCurrentMap(fodderArmy, newMap):
@@ -31,9 +33,7 @@ def runGameMap(economy, map, army, output):
 
 
 
-
-def main():
-    ### Demonstrate map generation
+def doMapGenerationComparison():
     # Init economy
     economy = Economy(500);
     # Init messaging
@@ -63,18 +63,73 @@ def main():
     # Compare the two
     # Show them
 
-    ### Demonstrate agent training
-    # Create a map
+def doAgentTrainingComparison():
+    # Init economy
+    economy = Economy(500);
+    # Init messaging
+    output = ConsoleOutput();
+    # Set colors
+    sAttackerColor = "white";
+
+    # A medium map
+    gameMap = GameMap(economy, 10, 10, 0.05, 0.15, 0.11, 0.08);
+
+    # Create an army
     # Select an army
+    army = Game.selectArmy(economy, gameMap, "white", output)
+
+    # Run game on map 10 times
+    allScores = []
+    for iCnt in range(10):
+        score = runGameMap(economy, gameMap, army, output)
+        allScores += [score]
+
+    # Record avg performance
+    os.rename("GameTimeline.json", "GameTimeline%s.json" % ("Untrained"))
+    print str("Scores for Untrained") + ":" + str(allScores)
+
+    # Evolve army RANDOM
+    myevol = RandomUnitEvolution()
+    myevol.evolveEachUnit(economy, gameMap, army)
+
+    # Reset scores
+    allScores = []
 
     # Run game on map 10 times
     # Record avg performance
-    # Evolve army
+    for iCnt in range(10):
+        score = runGameMap(economy, gameMap, army, output)
+        allScores += [score]
+
+    os.rename("GameTimeline.json", "GameTimeline%s.json" % ("TrainedRandom"))
+    print str("Scores for TrainedRandom") + ":" + str(allScores)
+
+    # Reset scores
+    allScores = []
+
+    # Evolve army GENETIC
+    MapBuilder.unit_evolver.getArmy(army, gameMap, economy)
+
     # Run game on map 10 times
     # Record avg performance
+    for iCnt in range(10):
+        score = runGameMap(economy, gameMap, army, output)
+        allScores += [score]
 
-    # Compare the two
-    # Show them
+    # Record avg performance
+    os.rename("GameTimeline.json", "GameTimeline%s.json" % ("TrainedGenetic"))
+    print str("Scores for TrainedGenetic") + ":" + str(allScores)
+
+
+
+
+def main():
+    ### Demonstrate map generation
+    # doMapGenerationComparison()
+
+    ### Demonstrate agent training
+    doAgentTrainingComparison()
+
 
 
 if __name__ == '__main__':
